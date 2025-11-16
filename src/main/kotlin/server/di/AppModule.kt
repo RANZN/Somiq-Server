@@ -1,7 +1,7 @@
-package com.ranjan.application.di
+package com.ranjan.server.di
 
-import com.ranjan.application.auth.AuthController
-import com.ranjan.application.post.PostController
+import com.ranjan.server.auth.AuthController
+import com.ranjan.server.post.PostController
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 

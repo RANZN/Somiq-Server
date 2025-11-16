@@ -1,4 +1,4 @@
-package com.ranjan.application.post
+package com.ranjan.server.post
 
 import com.ranjan.data.auth.service.JwtConfig
 import io.ktor.server.application.Application

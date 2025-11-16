@@ -1,4 +1,4 @@
-package com.ranjan.application.auth
+package com.ranjan.server.auth
 
 import com.ranjan.domain.auth.model.ErrorResponse
 import com.ranjan.domain.auth.model.ForgotPasswordRequest

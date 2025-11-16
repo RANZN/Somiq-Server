@@ -1,4 +1,4 @@
-package com.ranjan.application.update
+package com.ranjan.server.update
 
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.*

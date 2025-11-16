@@ -1,11 +1,11 @@
-package com.ranjan.application.post
+package com.ranjan.server.post
 
-import com.ranjan.application.common.extension.userId
-import com.ranjan.application.common.extension.userIdOrNull
 import com.ranjan.domain.common.model.PaginationRequest
 import com.ranjan.domain.auth.model.ErrorResponse
 import com.ranjan.domain.post.model.*
 import com.ranjan.domain.post.usecase.*
+import com.ranjan.server.common.extension.userId
+import com.ranjan.server.common.extension.userIdOrNull
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.plugins.NotFoundException

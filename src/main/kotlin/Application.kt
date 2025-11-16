@@ -2,13 +2,13 @@ package com.ranjan
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.ranjan.application.auth.authRoutes
-import com.ranjan.application.di.appModule
-import com.ranjan.application.post.postRoutes
-import com.ranjan.application.update.checkUpdateRoute
 import com.ranjan.data.auth.service.JwtConfig
 import com.ranjan.data.di.dataModule
 import com.ranjan.domain.di.domainModule
+import com.ranjan.server.auth.authRoutes
+import com.ranjan.server.di.appModule
+import com.ranjan.server.post.postRoutes
+import com.ranjan.server.update.checkUpdateRoute
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
