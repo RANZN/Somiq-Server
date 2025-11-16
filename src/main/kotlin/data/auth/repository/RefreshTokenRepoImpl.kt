@@ -1,8 +1,8 @@
-package com.ranjan.data.repository
+package com.ranjan.data.auth.repository
 
-import com.ranjan.data.db.DatabaseFactory.dbQuery
+import com.ranjan.data.auth.service.JwtConfig
+import com.ranjan.data.db.DatabaseFactory
 import com.ranjan.data.db.RefreshTokens
-import com.ranjan.data.service.JwtConfig
 import com.ranjan.domain.auth.model.RefreshTokenEntity
 import com.ranjan.domain.auth.repository.RefreshTokenRepo
 import kotlinx.datetime.Clock
@@ -15,7 +15,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 class RefreshTokenRepoImpl : RefreshTokenRepo {
 
-    override suspend fun save(userId: String, refreshToken: String): RefreshTokenEntity? = dbQuery {
+    override suspend fun save(userId: String, refreshToken: String): RefreshTokenEntity? = DatabaseFactory.dbQuery {
         val expiry = Clock.System.now().plus(JwtConfig.Lifetime.refresh)
         val insertStatement = RefreshTokens.insert {
             it[this.userId] = userId

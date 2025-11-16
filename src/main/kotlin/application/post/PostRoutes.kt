@@ -1,6 +1,6 @@
 package com.ranjan.application.post
 
-import com.ranjan.data.service.JwtConfig
+import com.ranjan.data.auth.service.JwtConfig
 import io.ktor.server.application.Application
 import io.ktor.server.auth.authenticate
 import io.ktor.server.routing.delete

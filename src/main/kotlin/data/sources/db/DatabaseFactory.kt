@@ -1,5 +1,6 @@
 package com.ranjan.data.db
 
+import com.ranjan.data.auth.model.UserTable
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import kotlinx.coroutines.Dispatchers

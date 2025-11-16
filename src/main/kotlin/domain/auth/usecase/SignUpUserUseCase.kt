@@ -4,8 +4,8 @@ import com.ranjan.domain.auth.model.AuthResponse
 import com.ranjan.domain.auth.model.SignupRequest
 import com.ranjan.domain.common.model.User
 import com.ranjan.domain.auth.repository.UserRepository
-import com.ranjan.domain.common.services.TokenProvider
-import com.ranjan.domain.common.services.PasswordCipher
+import com.ranjan.domain.auth.services.PasswordCipher
+import com.ranjan.domain.auth.services.TokenProvider
 import java.util.UUID
 
 class SignUpUserUseCase(

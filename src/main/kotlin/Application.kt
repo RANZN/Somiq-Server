@@ -3,11 +3,13 @@ package com.ranjan
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.ranjan.application.auth.authRoutes
+import com.ranjan.application.di.appModule
 import com.ranjan.application.post.postRoutes
 import com.ranjan.application.update.checkUpdateRoute
+import com.ranjan.data.auth.service.JwtConfig
 import com.ranjan.data.db.DatabaseFactory
-import com.ranjan.data.service.JwtConfig
-import com.ranjan.di.appModule
+import com.ranjan.data.di.dataModule
+import com.ranjan.domain.di.domainModule
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -38,7 +40,7 @@ fun Application.module() {
 
 fun Application.configureKoin() {
     install(Koin) {
-        modules(appModule)
+        modules(appModule, dataModule, domainModule)
     }
 }
 

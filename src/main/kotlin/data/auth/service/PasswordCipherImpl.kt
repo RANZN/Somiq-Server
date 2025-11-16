@@ -1,6 +1,6 @@
-package com.ranjan.data.service
+package com.ranjan.data.auth.service
 
-import com.ranjan.domain.common.services.PasswordCipher
+import com.ranjan.domain.auth.services.PasswordCipher
 import org.mindrot.jbcrypt.BCrypt
 
 class PasswordCipherImpl : PasswordCipher {

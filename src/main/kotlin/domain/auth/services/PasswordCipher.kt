@@ -1,4 +1,4 @@
-package com.ranjan.domain.common.services
+package com.ranjan.domain.auth.services
 
 interface PasswordCipher {
     suspend fun hashPassword(password: String): String

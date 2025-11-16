@@ -1,10 +1,10 @@
-package com.ranjan.data.service
+package com.ranjan.data.auth.service
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.ranjan.domain.auth.model.AuthToken
+import com.ranjan.domain.auth.services.TokenProvider
 import com.ranjan.domain.common.model.User
-import com.ranjan.domain.common.services.TokenProvider
 import java.util.Date
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes

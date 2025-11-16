@@ -4,8 +4,8 @@ import com.ranjan.domain.auth.model.AuthResponse
 import com.ranjan.domain.auth.model.LoginRequest
 import com.ranjan.domain.auth.repository.RefreshTokenRepo
 import com.ranjan.domain.auth.repository.UserRepository
-import com.ranjan.domain.common.services.TokenProvider
-import com.ranjan.domain.common.services.PasswordCipher
+import com.ranjan.domain.auth.services.PasswordCipher
+import com.ranjan.domain.auth.services.TokenProvider
 
 class LoginUserUseCase(
     private val userRepository: UserRepository,
