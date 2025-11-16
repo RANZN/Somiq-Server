@@ -1,4 +1,4 @@
-package com.ranjan.data.db
+package com.ranjan.data.sources.db
 
 import com.ranjan.data.auth.model.UserTable
 import com.zaxxer.hikari.HikariConfig

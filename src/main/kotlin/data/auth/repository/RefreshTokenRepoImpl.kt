@@ -1,8 +1,8 @@
 package com.ranjan.data.auth.repository
 
+import com.ranjan.data.auth.model.RefreshTokens
 import com.ranjan.data.auth.service.JwtConfig
-import com.ranjan.data.db.DatabaseFactory
-import com.ranjan.data.db.RefreshTokens
+import com.ranjan.data.sources.db.DatabaseFactory
 import com.ranjan.domain.auth.model.RefreshTokenEntity
 import com.ranjan.domain.auth.repository.RefreshTokenRepo
 import kotlinx.datetime.Clock

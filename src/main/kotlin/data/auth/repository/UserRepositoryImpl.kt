@@ -1,7 +1,7 @@
 package com.ranjan.data.auth.repository
 
-import com.ranjan.data.db.DatabaseFactory
 import com.ranjan.data.auth.model.UserTable
+import com.ranjan.data.sources.db.DatabaseFactory
 import com.ranjan.domain.auth.repository.UserRepository
 import com.ranjan.domain.common.model.User
 import org.jetbrains.exposed.sql.ResultRow

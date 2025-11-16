@@ -1,4 +1,4 @@
-package com.ranjan.data.db
+package com.ranjan.data.auth.model
 
 import kotlinx.datetime.Clock
 import org.jetbrains.exposed.sql.Table
