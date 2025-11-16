@@ -4,7 +4,7 @@ import com.ranjan.domain.common.model.PaginationRequest
 import com.ranjan.domain.common.model.PaginationResult
 import com.ranjan.domain.post.model.PostResponse
 import com.ranjan.domain.post.repository.PostRepository
-import java.util.UUID
+import java.util.*
 
 class GetPostsUseCase(
     private val postRepository: PostRepository
