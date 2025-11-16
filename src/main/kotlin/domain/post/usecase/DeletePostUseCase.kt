@@ -3,12 +3,13 @@ package com.ranjan.domain.post.usecase
 import com.ranjan.domain.common.exceptions.ForbiddenException
 import com.ranjan.domain.post.repository.PostRepository
 import io.ktor.server.plugins.NotFoundException
+import java.util.UUID
 
 class DeletePostUseCase(
     private val postRepository: PostRepository
 ) {
     suspend fun execute(
-        userId: String,
+        userId: UUID,
         postId: String
     ): Result<Unit> = runCatching {
 

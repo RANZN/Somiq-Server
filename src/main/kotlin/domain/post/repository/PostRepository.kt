@@ -5,15 +5,17 @@ import com.ranjan.domain.common.model.PaginationResult
 import com.ranjan.domain.post.model.CreatePostRequest
 import com.ranjan.domain.post.model.PostResponse
 import com.ranjan.domain.post.model.UpdatePostRequest
+import java.util.UUID
 
 interface PostRepository {
 
     suspend fun createPost(
-        userId: String,
+        userId: UUID,
         request: CreatePostRequest
     ): PostResponse
 
     suspend fun getPosts(
+        userId: UUID?,
         pagination: PaginationRequest
     ): PaginationResult<PostResponse>
 
@@ -29,12 +31,12 @@ interface PostRepository {
     suspend fun exists(postId: String): Boolean
 
     suspend fun toggleLike(
-        userId: String,
+        userId: UUID,
         postId: String
     ): PostResponse
 
     suspend fun toggleBookmark(
-        userId: String,
+        userId: UUID,
         postId: String
     ): PostResponse
 }

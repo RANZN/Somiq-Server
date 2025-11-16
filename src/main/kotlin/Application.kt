@@ -8,7 +8,6 @@ import com.ranjan.application.post.postRoutes
 import com.ranjan.application.update.checkUpdateRoute
 import com.ranjan.data.auth.service.JwtConfig
 import com.ranjan.data.di.dataModule
-import com.ranjan.data.sources.db.DatabaseFactory
 import com.ranjan.domain.di.domainModule
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
@@ -29,7 +28,6 @@ fun main(args: Array<String>) {
 
 @Suppress("unused")
 fun Application.module() {
-    DatabaseFactory.init()
     configureKoin()
     configureSerialization()
     configureSecurity()

@@ -4,7 +4,7 @@ import kotlinx.datetime.Clock
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 
-object RefreshTokens : Table("refresh_tokens") {
+object RefreshTokenTable : Table("refresh_tokens") {
     object Columns {
         const val ID = "id"
         const val USER_ID = "user_id"

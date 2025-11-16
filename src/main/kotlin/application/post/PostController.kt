@@ -1,13 +1,13 @@
 package com.ranjan.application.post
 
+import com.ranjan.application.common.extension.userId
+import com.ranjan.application.common.extension.userIdOrNull
 import com.ranjan.domain.common.model.PaginationRequest
 import com.ranjan.domain.auth.model.ErrorResponse
 import com.ranjan.domain.post.model.*
 import com.ranjan.domain.post.usecase.*
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
-import io.ktor.server.auth.jwt.JWTPrincipal
-import io.ktor.server.auth.principal
 import io.ktor.server.plugins.NotFoundException
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
@@ -26,6 +26,7 @@ class PostController(
     // GET /v1/posts
     // ---------------------------------------------------------
     suspend fun getPosts(call: ApplicationCall) {
+        val userId = call.userIdOrNull()
         val params = call.request.queryParameters
 
         val pagination = PaginationRequest(
@@ -33,7 +34,7 @@ class PostController(
             limit = params["limit"]?.toIntOrNull() ?: 20
         )
 
-        val result = getPostsUseCase.execute(pagination)
+        val result = getPostsUseCase.execute(userId, pagination)
 
         result.onSuccess {
             call.respond(HttpStatusCode.OK, it)
@@ -78,11 +79,10 @@ class PostController(
     // POST /v1/posts  (AUTH REQUIRED)
     // ---------------------------------------------------------
     suspend fun createPost(call: ApplicationCall) {
-        val userId = call.principal<JWTPrincipal>()
-            ?.payload?.getClaim("userId")?.asString()
-
-        if (userId == null) {
-            call.respond(HttpStatusCode.Unauthorized, ErrorResponse("Unauthorized"))
+        val userId = try {
+            call.userId()
+        } catch (_: Exception) {
+            call.respond(HttpStatusCode.Unauthorized, ErrorResponse("Login First to create post"))
             return
         }
 
@@ -112,17 +112,16 @@ class PostController(
     // PUT /v1/posts/{id}  (AUTH REQUIRED)
     // ---------------------------------------------------------
     suspend fun updatePost(call: ApplicationCall) {
-        val postId = call.parameters["id"]
-        val userId = call.principal<JWTPrincipal>()
-            ?.payload?.getClaim("userId")?.asString()
-
-        if (postId == null) {
-            call.respond(HttpStatusCode.BadRequest, ErrorResponse("Post id required"))
+        val userId = try {
+            call.userId()
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.Unauthorized, ErrorResponse(e.message ?: "Unauthorized"))
             return
         }
 
-        if (userId == null) {
-            call.respond(HttpStatusCode.Unauthorized, ErrorResponse("Unauthorized"))
+        val postId = call.parameters["id"]
+        if (postId.isNullOrEmpty()) {
+            call.respond(HttpStatusCode.BadRequest, ErrorResponse("Post id required"))
             return
         }
 
@@ -161,17 +160,16 @@ class PostController(
     // DELETE /v1/posts/{id}  (AUTH REQUIRED)
     // ---------------------------------------------------------
     suspend fun deletePost(call: ApplicationCall) {
-        val postId = call.parameters["id"]
-        val userId = call.principal<JWTPrincipal>()
-            ?.payload?.getClaim("userId")?.asString()
-
-        if (postId == null) {
-            call.respond(HttpStatusCode.BadRequest, ErrorResponse("Post id required"))
+        val userId = try {
+            call.userId()
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.Unauthorized, ErrorResponse(e.message ?: "Unauthorized"))
             return
         }
 
-        if (userId == null) {
-            call.respond(HttpStatusCode.Unauthorized, ErrorResponse("Unauthorized"))
+        val postId = call.parameters["id"]
+        if (postId == null) {
+            call.respond(HttpStatusCode.BadRequest, ErrorResponse("Post id required"))
             return
         }
 
@@ -200,17 +198,17 @@ class PostController(
     // POST /v1/posts/{id}/like (AUTH REQUIRED)
     // ---------------------------------------------------------
     suspend fun toggleLike(call: ApplicationCall) {
-        val postId = call.parameters["id"]
-        val userId = call.principal<JWTPrincipal>()
-            ?.payload?.getClaim("userId")?.asString()
-
-        if (postId == null) {
-            call.respond(HttpStatusCode.BadRequest, ErrorResponse("Post id required"))
+        val userId = try {
+            call.userId()
+        } catch (_: Exception) {
+            call.respond(HttpStatusCode.Unauthorized, ErrorResponse("Login to perform Like"))
             return
         }
 
-        if (userId == null) {
-            call.respond(HttpStatusCode.Unauthorized, ErrorResponse("Unauthorized"))
+        val postId = call.parameters["id"]
+
+        if (postId == null) {
+            call.respond(HttpStatusCode.BadRequest, ErrorResponse("Post id required"))
             return
         }
 
@@ -230,17 +228,17 @@ class PostController(
     // POST /v1/posts/{id}/bookmark (AUTH REQUIRED)
     // ---------------------------------------------------------
     suspend fun toggleBookmark(call: ApplicationCall) {
-        val postId = call.parameters["id"]
-        val userId = call.principal<JWTPrincipal>()
-            ?.payload?.getClaim("userId")?.asString()
-
-        if (postId == null) {
-            call.respond(HttpStatusCode.BadRequest, ErrorResponse("Post id required"))
+        val userId = try {
+            call.userId()
+        } catch (_: Exception) {
+            call.respond(HttpStatusCode.Unauthorized, ErrorResponse("Login to Bookmark posts"))
             return
         }
 
-        if (userId == null) {
-            call.respond(HttpStatusCode.Unauthorized, ErrorResponse("Unauthorized"))
+        val postId = call.parameters["id"]
+
+        if (postId == null) {
+            call.respond(HttpStatusCode.BadRequest, ErrorResponse("Post id required"))
             return
         }
 
