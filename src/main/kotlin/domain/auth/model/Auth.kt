@@ -1,5 +1,6 @@
-package com.ranjan.domain.model
+package com.ranjan.domain.auth.model
 
+import com.ranjan.domain.common.model.UserResponse
 import kotlinx.serialization.Serializable
 
 @Serializable

@@ -3,6 +3,7 @@ package com.ranjan
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.ranjan.application.auth.authRoutes
+import com.ranjan.application.post.postRoutes
 import com.ranjan.application.update.checkUpdateRoute
 import com.ranjan.data.db.DatabaseFactory
 import com.ranjan.data.service.JwtConfig
@@ -44,6 +45,7 @@ fun Application.configureKoin() {
 fun Application.configureRoutes() {
     checkUpdateRoute()
     authRoutes()
+    postRoutes()
 }
 
 fun Application.configureSerialization() {

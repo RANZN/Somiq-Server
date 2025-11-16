@@ -3,8 +3,8 @@ package com.ranjan.data.repository
 import com.ranjan.data.db.DatabaseFactory.dbQuery
 import com.ranjan.data.db.RefreshTokens
 import com.ranjan.data.service.JwtConfig
-import com.ranjan.domain.model.RefreshTokenEntity
-import com.ranjan.domain.repository.RefreshTokenRepo
+import com.ranjan.domain.auth.model.RefreshTokenEntity
+import com.ranjan.domain.auth.repository.RefreshTokenRepo
 import kotlinx.datetime.Clock
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq

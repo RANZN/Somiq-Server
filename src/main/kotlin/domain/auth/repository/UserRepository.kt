@@ -1,6 +1,6 @@
-package com.ranjan.domain.repository
+package com.ranjan.domain.auth.repository
 
-import com.ranjan.domain.model.User
+import com.ranjan.domain.common.model.User
 
 interface UserRepository {
     suspend fun findByEmail(email: String): User?

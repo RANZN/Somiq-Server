@@ -1,7 +1,7 @@
 package com.ranjan.application.post
 
 import com.ranjan.domain.common.model.PaginationRequest
-import com.ranjan.domain.model.ErrorResponse
+import com.ranjan.domain.auth.model.ErrorResponse
 import com.ranjan.domain.post.model.*
 import com.ranjan.domain.post.usecase.*
 import io.ktor.http.HttpStatusCode

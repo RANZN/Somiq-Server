@@ -2,8 +2,8 @@ package com.ranjan.data.repository
 
 import com.ranjan.data.db.DatabaseFactory.dbQuery
 import com.ranjan.data.db.UserTable
-import com.ranjan.domain.model.User
-import com.ranjan.domain.repository.UserRepository
+import com.ranjan.domain.common.model.User
+import com.ranjan.domain.auth.repository.UserRepository
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll

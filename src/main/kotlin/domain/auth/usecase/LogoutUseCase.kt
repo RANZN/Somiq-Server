@@ -1,6 +1,6 @@
-package com.ranjan.domain.usecase.auth
+package com.ranjan.domain.auth.usecase
 
-import com.ranjan.domain.repository.RefreshTokenRepo
+import com.ranjan.domain.auth.repository.RefreshTokenRepo
 
 class LogoutUseCase(
     private val refreshTokenRepo: RefreshTokenRepo,

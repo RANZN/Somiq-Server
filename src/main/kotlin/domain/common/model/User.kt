@@ -1,4 +1,4 @@
-package com.ranjan.domain.model
+package com.ranjan.domain.common.model
 
 import com.ranjan.util.UUIDSerializer
 import kotlinx.serialization.Serializable

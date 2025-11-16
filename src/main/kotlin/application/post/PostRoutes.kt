@@ -28,7 +28,6 @@ fun Application.postRoutes() {
                 // Interactions
                 post("/{id}/like") { postController.toggleLike(call) }
                 post("/{id}/bookmark") { postController.toggleBookmark(call) }
-                post("/{id}/view") { postController.registerView(call) }
             }
         }
     }

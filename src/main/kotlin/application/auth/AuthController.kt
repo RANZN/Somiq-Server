@@ -1,14 +1,14 @@
 package com.ranjan.application.auth
 
-import com.ranjan.domain.model.ErrorResponse
-import com.ranjan.domain.model.ForgotPasswordRequest
-import com.ranjan.domain.model.LoginRequest
-import com.ranjan.domain.model.ResetPasswordRequest
-import com.ranjan.domain.model.SignupRequest
-import com.ranjan.domain.usecase.auth.ForgotPasswordUseCase
-import com.ranjan.domain.usecase.auth.LoginUserUseCase
-import com.ranjan.domain.usecase.auth.LogoutUseCase
-import com.ranjan.domain.usecase.auth.SignUpUserUseCase
+import com.ranjan.domain.auth.model.ErrorResponse
+import com.ranjan.domain.auth.model.ForgotPasswordRequest
+import com.ranjan.domain.auth.model.LoginRequest
+import com.ranjan.domain.auth.model.ResetPasswordRequest
+import com.ranjan.domain.auth.model.SignupRequest
+import com.ranjan.domain.auth.usecase.ForgotPasswordUseCase
+import com.ranjan.domain.auth.usecase.LoginUserUseCase
+import com.ranjan.domain.auth.usecase.LogoutUseCase
+import com.ranjan.domain.auth.usecase.SignUpUserUseCase
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.request.header

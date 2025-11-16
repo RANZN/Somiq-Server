@@ -1,6 +1,6 @@
-package com.ranjan.domain.usecase.auth
+package com.ranjan.domain.auth.usecase
 
-import com.ranjan.domain.repository.UserRepository
+import com.ranjan.domain.auth.repository.UserRepository
 
 class ForgotPasswordUseCase(
     private val userRepository: UserRepository,
