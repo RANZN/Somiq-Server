@@ -1,4 +1,4 @@
-rootProject.name = "smartcents"
+rootProject.name = "Somiq-server"
 
 dependencyResolutionManagement {
     repositories {
