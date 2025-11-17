@@ -1,6 +1,8 @@
 package com.ranjan.domain.di
 
+import com.ranjan.domain.auth.usecase.ForgotPasswordUseCase
 import com.ranjan.domain.auth.usecase.LoginUserUseCase
+import com.ranjan.domain.auth.usecase.LogoutUseCase
 import com.ranjan.domain.auth.usecase.SignUpUserUseCase
 import com.ranjan.domain.post.usecase.CreatePostUseCase
 import com.ranjan.domain.post.usecase.DeletePostUseCase
@@ -15,6 +17,9 @@ import org.koin.dsl.module
 val domainModule = module {
     factoryOf(::LoginUserUseCase)
     factoryOf(::SignUpUserUseCase)
+    factoryOf(::ForgotPasswordUseCase)
+    factoryOf(::LogoutUseCase)
+
     factoryOf(::CreatePostUseCase)
     factoryOf(::DeletePostUseCase)
     factoryOf(::GetPostByIdUseCase)
