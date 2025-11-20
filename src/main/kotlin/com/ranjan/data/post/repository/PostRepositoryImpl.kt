@@ -69,14 +69,18 @@ class PostRepositoryImpl(
         // Batch fetch likes count
         val likesCounts = PostLikeTable.select(PostLikeTable.postId, PostLikeTable.postId.count())
             .where { PostLikeTable.postId inList postIds }
-            .groupBy { it[PostLikeTable.postId] }
-            .mapValues { it.value.first()[PostLikeTable.postId.count()] }
+            .groupBy(PostLikeTable.postId)
+            .associate { row ->
+                row[PostLikeTable.postId] to row[PostLikeTable.postId.count()]
+            }
 
         // Batch fetch bookmarks count
         val bookmarksCounts = PostBookmarkTable.select(PostBookmarkTable.postId, PostBookmarkTable.postId.count())
             .where { PostBookmarkTable.postId inList postIds }
-            .groupBy { it[PostBookmarkTable.postId] }
-            .mapValues { it.value.first()[PostBookmarkTable.postId.count()] }
+            .groupBy(PostBookmarkTable.postId)
+            .associate { row ->
+                row[PostBookmarkTable.postId] to row[PostBookmarkTable.postId.count()]
+            }
 
         // User-specific flags
         val userLikes = userId?.let {
@@ -93,7 +97,7 @@ class PostRepositoryImpl(
         val items = postIds.map { postId ->
             val row = postData[postId]!!
             PostResponse(
-                id = postId,
+                postId = postId,
                 title = row[PostTable.title],
                 content = row[PostTable.content],
                 mediaUrls = row[PostTable.mediaUrls].toMediaUrls(),
@@ -212,7 +216,7 @@ class PostRepositoryImpl(
         } ?: false
 
         return PostResponse(
-            id = postId,
+            postId = postId,
             title = post[PostTable.title],
             content = post[PostTable.content],
             mediaUrls = post[PostTable.mediaUrls].toMediaUrls(),

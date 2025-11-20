@@ -5,16 +5,13 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.ranjan.data.auth.service.JwtConfig
 import com.ranjan.data.di.dataModule
 import com.ranjan.domain.di.domainModule
-import com.ranjan.server.auth.authRoutes
+import com.ranjan.server.configureRoutes
 import com.ranjan.server.di.appModule
-import com.ranjan.server.post.postRoutes
-import com.ranjan.server.update.checkUpdateRoute
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
-import io.ktor.server.auth.Authentication
-import io.ktor.server.auth.jwt.JWTPrincipal
-import io.ktor.server.auth.jwt.jwt
+import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.statuspages.*
@@ -41,12 +38,6 @@ fun Application.configureKoin() {
         printLogger()
         modules(appModule, dataModule, domainModule)
     }
-}
-
-fun Application.configureRoutes() {
-    checkUpdateRoute()
-    authRoutes()
-    postRoutes()
 }
 
 fun Application.configureSerialization() {
@@ -106,6 +97,6 @@ fun Application.configureCORS() {
         allowMethod(HttpMethod.Post)
         allowHeader(HttpHeaders.Authorization)
         allowHeader(HttpHeaders.ContentType)
-        anyHost() // In production, you should restrict this
+        anyHost() //todo: In production, we should restrict this
     }
 }

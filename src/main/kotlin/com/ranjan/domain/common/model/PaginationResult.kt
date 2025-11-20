@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PaginationResult<T>(
-    val items: List<T>,
+    val data: List<T>,
     val nextCursor: String?       // null means end of list
 )

@@ -6,7 +6,7 @@ import java.util.UUID
 
 @Serializable
 data class PostResponse(
-    val id: String,
+    val postId: String,
     val title: String,
     val content: String,
     @Serializable(with = UUIDSerializer::class)
