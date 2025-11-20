@@ -15,10 +15,6 @@ object DbConfig {
 
 object DataSourceProvider {
     fun initDatabase(): Database {
-        println(DbConfig.DRIVER)
-        println(DbConfig.URL)
-        println(DbConfig.USER)
-        println(DbConfig.PASSWORD)
         val dataSource = createHikariDataSource(DbConfig.URL, DbConfig.DRIVER, DbConfig.USER, DbConfig.PASSWORD)
         val database = Database.connect(dataSource)
 
