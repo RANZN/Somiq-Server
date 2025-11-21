@@ -8,6 +8,7 @@ import com.ranjan.domain.auth.services.TokenProvider
 import com.ranjan.domain.common.model.User
 import java.util.Date
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
 
 object JwtConfig {
     const val NAME = "auth-jwt" //todo change all these constants to env variables
@@ -22,7 +23,7 @@ object JwtConfig {
     }
 
     object Lifetime {
-        val access = 10.days
+        val access = 15.minutes
         val refresh = 7.days
     }
 }
