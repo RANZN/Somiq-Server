@@ -2,12 +2,12 @@ package com.ranjan.data.auth.service
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import com.ranjan.data.util.TimeProvider
 import com.ranjan.domain.auth.model.AuthToken
 import com.ranjan.domain.auth.services.TokenProvider
 import com.ranjan.domain.common.model.User
 import java.util.Date
 import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.minutes
 
 object JwtConfig {
     const val NAME = "auth-jwt" //todo change all these constants to env variables
@@ -22,12 +22,14 @@ object JwtConfig {
     }
 
     object Lifetime {
-        val access = 15.minutes
+        val access = 10.days
         val refresh = 7.days
     }
 }
 
-class JwtTokenProvider : TokenProvider {
+class JwtTokenProvider(
+    private val timeProvider: TimeProvider
+) : TokenProvider {
 
     override fun createToken(user: User): AuthToken {
         val accessToken = generateAccessToken(user)
@@ -37,10 +39,10 @@ class JwtTokenProvider : TokenProvider {
     }
 
     private fun generateAccessToken(user: User): String {
-        val validity = Date(System.currentTimeMillis() + JwtConfig.Lifetime.access.inWholeMilliseconds)
+        val validity = Date(timeProvider.nowMillis() + JwtConfig.Lifetime.access.inWholeMilliseconds)
         return JWT.create()
             .withIssuer(JwtConfig.ISSUER)
-            .withAudience(JwtConfig.ISSUER)
+            .withAudience(JwtConfig.AUDIENCE)
             .withClaim(JwtConfig.Claims.USER_ID, user.userId.toString())
             .withClaim(JwtConfig.Claims.EMAIL, user.email)
             .withClaim(JwtConfig.Claims.NAME, user.name)
@@ -49,10 +51,10 @@ class JwtTokenProvider : TokenProvider {
     }
 
     private fun generateRefreshToken(userId: String): String {
-        val validity = Date(System.currentTimeMillis() + JwtConfig.Lifetime.refresh.inWholeMilliseconds)
+        val validity = Date(timeProvider.nowMillis() + JwtConfig.Lifetime.refresh.inWholeMilliseconds)
         return JWT.create()
             .withIssuer(JwtConfig.ISSUER)
-            .withAudience(JwtConfig.ISSUER)
+            .withAudience(JwtConfig.AUDIENCE)
             .withSubject(userId)
             .withExpiresAt(validity)
             .sign(Algorithm.HMAC256(JwtConfig.SECRET))

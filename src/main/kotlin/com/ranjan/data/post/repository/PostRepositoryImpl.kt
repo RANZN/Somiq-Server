@@ -39,8 +39,8 @@ class PostRepositoryImpl(
             row[content] = request.content
             row[mediaUrls] = request.mediaUrls.toDbString()
             row[authorId] = userId
-            row[createdAt] = timeProvider.now()
-            row[updatedAt] = timeProvider.now()
+            row[createdAt] = timeProvider.nowMillis()
+            row[updatedAt] = timeProvider.nowMillis()
         }
 
         buildPostResponse(postId, userId)
@@ -135,7 +135,7 @@ class PostRepositoryImpl(
             row[title] = request.title ?: existing[PostTable.title]
             row[content] = request.content ?: existing[PostTable.content]
             row[mediaUrls] = request.mediaUrls?.toDbString() ?: existing[PostTable.mediaUrls]
-            row[updatedAt] = timeProvider.now()
+            row[updatedAt] = timeProvider.nowMillis()
         }
 
         buildPostResponse(postId)
