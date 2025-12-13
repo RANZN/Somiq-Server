@@ -2,7 +2,6 @@ package com.ranjan.data.reel.model
 
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.Table
-import java.util.UUID
 
 object ReelViewTable : Table("reel_view_table") {
     object Columns {

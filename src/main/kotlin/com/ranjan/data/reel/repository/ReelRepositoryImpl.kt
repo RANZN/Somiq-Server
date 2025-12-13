@@ -1,6 +1,7 @@
 package com.ranjan.data.reel.repository
 
 import com.ranjan.data.auth.model.UserTable
+import com.ranjan.data.comment.model.CommentTable
 import com.ranjan.data.reel.model.ReelBookmarkTable
 import com.ranjan.data.reel.model.ReelLikeTable
 import com.ranjan.data.reel.model.ReelTable
@@ -65,15 +66,15 @@ class ReelRepositoryImpl(
             .groupBy(ReelLikeTable.reelId)
             .associate { row -> row[ReelLikeTable.reelId] to row[ReelLikeTable.reelId.count()] }
 
-        val bookmarksCounts = ReelBookmarkTable.select(ReelBookmarkTable.reelId, ReelBookmarkTable.reelId.count())
-            .where { ReelBookmarkTable.reelId inList reelIds }
-            .groupBy(ReelBookmarkTable.reelId)
-            .associate { row -> row[ReelBookmarkTable.reelId] to row[ReelBookmarkTable.reelId.count()] }
-
         val viewsCounts = ReelViewTable.select(ReelViewTable.reelId, ReelViewTable.reelId.count())
             .where { ReelViewTable.reelId inList reelIds }
             .groupBy(ReelViewTable.reelId)
             .associate { row -> row[ReelViewTable.reelId] to row[ReelViewTable.reelId.count()] }
+
+        val commentsCounts = CommentTable.select(CommentTable.reelId, CommentTable.reelId.count())
+            .where { (CommentTable.reelId inList reelIds) and (CommentTable.parentCommentId.isNull()) }
+            .groupBy(CommentTable.reelId)
+            .associate { row -> row[CommentTable.reelId] to row[CommentTable.reelId.count()] }
 
         val userLikes = userId?.let {
             ReelLikeTable.selectAll().where { (ReelLikeTable.userId eq it) and (ReelLikeTable.reelId inList reelIds) }
@@ -106,7 +107,7 @@ class ReelRepositoryImpl(
                 createdAt = row[ReelTable.createdAt],
                 updatedAt = row[ReelTable.updatedAt],
                 likesCount = likesCounts[reelId] ?: 0,
-                commentsCount = 0, // TODO: Add comments functionality
+                commentsCount = commentsCounts[reelId] ?: 0,
                 viewsCount = viewsCounts[reelId] ?: 0,
                 isLiked = reelId in userLikes,
                 isBookmarked = reelId in userBookmarks
@@ -217,8 +218,10 @@ class ReelRepositoryImpl(
             .single()
 
         val likesCount = ReelLikeTable.selectAll().where { ReelLikeTable.reelId eq reelId }.count()
-        val bookmarksCount = ReelBookmarkTable.selectAll().where { ReelBookmarkTable.reelId eq reelId }.count()
         val viewsCount = ReelViewTable.selectAll().where { ReelViewTable.reelId eq reelId }.count()
+        val commentsCount = CommentTable.selectAll()
+            .where { (CommentTable.reelId eq reelId) and (CommentTable.parentCommentId.isNull()) }
+            .count()
         val isLiked = viewerId?.let {
             ReelLikeTable.selectAll().where { (ReelLikeTable.reelId eq reelId) and (ReelLikeTable.userId eq it) }.any()
         } ?: false
@@ -240,7 +243,7 @@ class ReelRepositoryImpl(
             createdAt = reel[ReelTable.createdAt],
             updatedAt = reel[ReelTable.updatedAt],
             likesCount = likesCount,
-            commentsCount = 0, // TODO: Add comments
+            commentsCount = commentsCount,
             viewsCount = viewsCount,
             isLiked = isLiked,
             isBookmarked = isBookmarked

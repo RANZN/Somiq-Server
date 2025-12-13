@@ -14,7 +14,7 @@ data class CommentResponse(
     val authorUsername: String?,
     val authorProfilePictureUrl: String?,
     @Serializable(with = UUIDSerializer::class)
-    val parentCommentId: String? = null, // For nested replies
+    val parentCommentId: String? = null,
     val createdAt: Long,
     val updatedAt: Long?,
     val likesCount: Long,

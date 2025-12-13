@@ -10,7 +10,6 @@ import com.ranjan.domain.notification.model.NotificationResponse
 import com.ranjan.domain.notification.model.NotificationType
 import com.ranjan.domain.notification.repository.NotificationRepository
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import java.util.UUID
 
 class NotificationRepositoryImpl(

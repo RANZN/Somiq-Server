@@ -123,7 +123,7 @@ class CommentRepositoryImpl(
     }
 
     override suspend fun updateComment(commentId: String, request: UpdateCommentRequest): CommentResponse = db.dbQuery {
-        val existing = CommentTable.selectAll().where { CommentTable.commentId eq commentId }.singleOrNull()
+        CommentTable.selectAll().where { CommentTable.commentId eq commentId }.singleOrNull()
             ?: throw NotFoundException("Comment not found")
 
         CommentTable.update({ CommentTable.commentId eq commentId }) { row ->

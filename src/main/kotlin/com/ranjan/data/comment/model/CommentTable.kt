@@ -1,8 +1,6 @@
 package com.ranjan.data.comment.model
 
 import com.ranjan.data.auth.model.UserTable
-import com.ranjan.data.post.model.PostTable
-import com.ranjan.data.reel.model.ReelTable
 import org.jetbrains.exposed.sql.Table
 
 object CommentTable : Table("comment_table") {

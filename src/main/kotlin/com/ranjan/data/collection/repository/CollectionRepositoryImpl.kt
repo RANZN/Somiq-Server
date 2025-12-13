@@ -101,7 +101,7 @@ class CollectionRepositoryImpl(
 
     override suspend fun addItem(collectionId: String, userId: UUID, itemType: String, itemRefId: String): CollectionItemResponse = db.dbQuery {
         // Verify collection belongs to user
-        val collection = CollectionTable.selectAll()
+        CollectionTable.selectAll()
             .where { (CollectionTable.collectionId eq collectionId) and (CollectionTable.userId eq userId) }
             .singleOrNull() ?: throw NotFoundException("Collection not found")
 
@@ -144,7 +144,7 @@ class CollectionRepositoryImpl(
     override suspend fun removeItem(collectionId: String, itemId: String, userId: UUID) {
         db.dbQuery {
             // Verify collection belongs to user
-            val collection = CollectionTable.selectAll()
+            CollectionTable.selectAll()
                 .where { (CollectionTable.collectionId eq collectionId) and (CollectionTable.userId eq userId) }
                 .singleOrNull() ?: throw NotFoundException("Collection not found")
 
@@ -159,7 +159,7 @@ class CollectionRepositoryImpl(
 
     override suspend fun getCollectionItems(collectionId: String, userId: UUID): List<CollectionItemResponse> = db.dbQuery {
         // Verify collection belongs to user
-        val collection = CollectionTable.selectAll()
+        CollectionTable.selectAll()
             .where { (CollectionTable.collectionId eq collectionId) and (CollectionTable.userId eq userId) }
             .singleOrNull() ?: throw NotFoundException("Collection not found")
 

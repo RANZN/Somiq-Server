@@ -11,8 +11,6 @@ import com.ranjan.domain.post.model.PostResponse
 import com.ranjan.domain.reel.model.ReelResponse
 import com.ranjan.domain.search.repository.SearchRepository
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
-import java.util.UUID
 
 class SearchRepositoryImpl(
     private val db: Database

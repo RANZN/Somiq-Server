@@ -14,7 +14,6 @@ import com.ranjan.domain.story.repository.StoryRepository
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
 import java.util.UUID
 
 class StoryRepositoryImpl(

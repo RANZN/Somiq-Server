@@ -3,7 +3,6 @@ package com.ranjan.domain.account.usecase
 import com.ranjan.domain.account.model.ProfileResponse
 import com.ranjan.domain.account.model.UpdateProfileRequest
 import com.ranjan.domain.auth.repository.UserRepository
-import com.ranjan.domain.common.model.User
 import java.util.UUID
 
 class UpdateProfileUseCase(
