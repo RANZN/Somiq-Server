@@ -84,9 +84,10 @@ class AuthController(
                 }
 
                 is IllegalStateException -> {
+                    val errorMessage = exception.message ?: "This resource already exists."
                     call.respond(
                         HttpStatusCode.Conflict,
-                        ErrorResponse(exception.message ?: "This resource already exists.")
+                        ErrorResponse(errorMessage)
                     )
                 }
 

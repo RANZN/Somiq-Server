@@ -20,7 +20,11 @@ class SignUpUserUseCase(
         }
 
         if (userRepository.isEmailExists(signUpRequest.email)) {
-            throw IllegalStateException("User already exists with this email")
+            throw IllegalStateException("EMAIL_ALREADY_IN_USE")
+        }
+
+        if (userRepository.isUsernameExists(signUpRequest.username)) {
+            throw IllegalStateException("USERNAME_ALREADY_IN_USE")
         }
 
         val hashedPassword = passwordCipher.hashPassword(signUpRequest.password)
@@ -28,6 +32,7 @@ class SignUpUserUseCase(
         val newUser = User(
             userId = UUID.randomUUID(), // Generate the ID here
             name = signUpRequest.name,
+            username = signUpRequest.username,
             email = signUpRequest.email,
             hashedPassword = hashedPassword
         )
