@@ -1,5 +1,6 @@
 package com.ranjan.data.post.repository
 
+import com.ranjan.data.auth.model.UserTable
 import com.ranjan.data.common.extension.toDbString
 import com.ranjan.data.common.extension.toMediaUrls
 import com.ranjan.data.sources.db.dbQuery
@@ -94,14 +95,23 @@ class PostRepositoryImpl(
                 .map { it[PostBookmarkTable.postId] }.toSet()
         } ?: emptySet()
 
+        // Batch fetch author information
+        val authorIds = postData.values.map { it[PostTable.authorId] }.distinct()
+        val authors = UserTable.selectAll().where { UserTable.userId inList authorIds }
+            .associateBy { it[UserTable.userId] }
+
         val items = postIds.map { postId ->
             val row = postData[postId]!!
+            val author = authors[row[PostTable.authorId]]!!
             PostResponse(
                 postId = postId,
                 title = row[PostTable.title],
                 content = row[PostTable.content],
                 mediaUrls = row[PostTable.mediaUrls].toMediaUrls(),
                 authorId = row[PostTable.authorId],
+                authorName = author[UserTable.name],
+                authorUsername = author[UserTable.username],
+                authorProfilePictureUrl = author[UserTable.profilePictureUrl],
                 createdAt = row[PostTable.createdAt],
                 updatedAt = row[PostTable.updatedAt],
                 likesCount = likesCounts[postId] ?: 0,
@@ -203,7 +213,10 @@ class PostRepositoryImpl(
     // BUILD POST RESPONSE
     // ------------------------------
     private fun buildPostResponse(postId: String, viewerId: UUID? = null): PostResponse {
-        val post = PostTable.selectAll().where { PostTable.postId eq postId }.single()
+        val post = (PostTable innerJoin UserTable)
+            .selectAll()
+            .where { PostTable.postId eq postId }
+            .single()
 
         val likesCount = PostLikeTable.selectAll().where { PostLikeTable.postId eq postId }.count()
         val bookmarksCount = PostBookmarkTable.selectAll().where { PostBookmarkTable.postId eq postId }.count()
@@ -221,6 +234,9 @@ class PostRepositoryImpl(
             content = post[PostTable.content],
             mediaUrls = post[PostTable.mediaUrls].toMediaUrls(),
             authorId = post[PostTable.authorId],
+            authorName = post[UserTable.name],
+            authorUsername = post[UserTable.username],
+            authorProfilePictureUrl = post[UserTable.profilePictureUrl],
             createdAt = post[PostTable.createdAt],
             updatedAt = post[PostTable.updatedAt],
             likesCount = likesCount,

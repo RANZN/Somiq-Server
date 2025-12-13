@@ -11,6 +11,9 @@ data class PostResponse(
     val content: String,
     @Serializable(with = UUIDSerializer::class)
     val authorId: UUID,
+    val authorName: String,
+    val authorUsername: String?,
+    val authorProfilePictureUrl: String?,
     val createdAt: Long,
     val updatedAt: Long?,
     val mediaUrls: List<String>,

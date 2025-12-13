@@ -10,12 +10,18 @@ data class User(
     val userId: UUID,
     val name: String,
     val email: String,
+    val username: String? = null,
+    val profilePictureUrl: String? = null,
+    val bio: String? = null,
     val hashedPassword: String,
 ) {
     fun asResponse() = UserResponse(
         userId = userId.toString(),
         name = name,
-        email = email
+        email = email,
+        username = username,
+        profilePictureUrl = profilePictureUrl,
+        bio = bio
     )
 }
 
@@ -24,4 +30,7 @@ data class UserResponse(
     val userId: String,
     val name: String,
     val email: String,
+    val username: String? = null,
+    val profilePictureUrl: String? = null,
+    val bio: String? = null,
 )
