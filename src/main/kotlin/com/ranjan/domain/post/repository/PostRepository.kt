@@ -4,6 +4,7 @@ import com.ranjan.domain.common.model.PaginationRequest
 import com.ranjan.domain.common.model.PaginationResult
 import com.ranjan.domain.post.model.CreatePostRequest
 import com.ranjan.domain.post.model.PostResponse
+import com.ranjan.domain.post.model.ToggleResponse
 import com.ranjan.domain.post.model.UpdatePostRequest
 import java.util.UUID
 
@@ -33,10 +34,10 @@ interface PostRepository {
     suspend fun toggleLike(
         userId: UUID,
         postId: String
-    ): PostResponse
+    ): ToggleResponse
 
     suspend fun toggleBookmark(
         userId: UUID,
         postId: String
-    ): PostResponse
+    ): ToggleResponse
 }

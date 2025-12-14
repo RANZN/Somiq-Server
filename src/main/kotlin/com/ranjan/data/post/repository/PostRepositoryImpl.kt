@@ -12,6 +12,7 @@ import com.ranjan.domain.common.model.PaginationRequest
 import com.ranjan.domain.common.model.PaginationResult
 import com.ranjan.domain.post.model.CreatePostRequest
 import com.ranjan.domain.post.model.PostResponse
+import com.ranjan.domain.post.model.ToggleResponse
 import com.ranjan.domain.post.model.UpdatePostRequest
 import com.ranjan.domain.post.repository.PostRepository
 import io.ktor.server.plugins.*
@@ -172,7 +173,7 @@ class PostRepositoryImpl(
     // ------------------------------
     // TOGGLE LIKE
     // ------------------------------
-    override suspend fun toggleLike(userId: UUID, postId: String): PostResponse = db.dbQuery {
+    override suspend fun toggleLike(userId: UUID, postId: String): ToggleResponse = db.dbQuery {
         val alreadyLiked =
             PostLikeTable.selectAll().where { (PostLikeTable.userId eq userId) and (PostLikeTable.postId eq postId) }
                 .limit(1).any()
@@ -186,13 +187,13 @@ class PostRepositoryImpl(
             }
         }
 
-        buildPostResponse(postId, userId)
+        buildToggleResponse(postId, userId)
     }
 
     // ------------------------------
     // TOGGLE BOOKMARK
     // ------------------------------
-    override suspend fun toggleBookmark(userId: UUID, postId: String): PostResponse = db.dbQuery {
+    override suspend fun toggleBookmark(userId: UUID, postId: String): ToggleResponse = db.dbQuery {
         val alreadyBookmarked = PostBookmarkTable.selectAll()
             .where { (PostBookmarkTable.userId eq userId) and (PostBookmarkTable.postId eq postId) }
             .limit(1).any()
@@ -206,7 +207,7 @@ class PostRepositoryImpl(
             }
         }
 
-        buildPostResponse(postId, userId)
+        buildToggleResponse(postId, userId)
     }
 
     // ------------------------------
@@ -243,6 +244,27 @@ class PostRepositoryImpl(
             bookmarksCount = bookmarksCount,
             isLiked = isLiked,
             isBookmarked = isBookmarked
+        )
+    }
+
+    // ------------------------------
+    // BUILD TOGGLE RESPONSE (Minimal response for toggle operations)
+    // ------------------------------
+    private fun buildToggleResponse(postId: String, viewerId: UUID): ToggleResponse {
+        val likesCount = PostLikeTable.selectAll().where { PostLikeTable.postId eq postId }.count()
+        val bookmarksCount = PostBookmarkTable.selectAll().where { PostBookmarkTable.postId eq postId }.count()
+        val isLiked = PostLikeTable.selectAll()
+            .where { (PostLikeTable.postId eq postId) and (PostLikeTable.userId eq viewerId) }
+            .any()
+        val isBookmarked = PostBookmarkTable.selectAll()
+            .where { (PostBookmarkTable.postId eq postId) and (PostBookmarkTable.userId eq viewerId) }
+            .any()
+
+        return ToggleResponse(
+            isLiked = isLiked,
+            isBookmarked = isBookmarked,
+            likesCount = likesCount,
+            bookmarksCount = bookmarksCount
         )
     }
 }
