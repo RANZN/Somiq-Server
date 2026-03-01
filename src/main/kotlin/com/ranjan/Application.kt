@@ -36,7 +36,7 @@ fun Application.module() {
 fun Application.configureKoin() {
     install(Koin) {
         printLogger()
-        modules(appModule, dataModule, domainModule)
+        modules(dataModule, domainModule, appModule)
     }
 }
 
