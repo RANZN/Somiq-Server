@@ -9,6 +9,7 @@ import kotlinx.datetime.Clock
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
@@ -28,9 +29,9 @@ class RefreshTokenRepoImpl(
         insertStatement.resultedValues?.singleOrNull()?.let(::toRefreshTokenEntity)
     }
 
-    override suspend fun findByToken(token: String): Boolean {
-        return RefreshTokenTable.selectAll().where {
-            RefreshTokenTable.token eq token
+    override suspend fun findByToken(userId: String, token: String): Boolean = db.dbQuery {
+        RefreshTokenTable.selectAll().where {
+            (RefreshTokenTable.userId eq userId) and (RefreshTokenTable.token eq token)
         }.empty().not()
     }
 

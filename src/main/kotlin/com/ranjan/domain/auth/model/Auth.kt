@@ -35,6 +35,17 @@ data class AuthResponse(
 )
 
 @Serializable
+data class RefreshTokenRequest(
+    val refreshToken: String
+)
+
+@Serializable
+data class RefreshTokenResponse(
+    val accessToken: String,
+    val refreshToken: String
+)
+
+@Serializable
 data class ErrorResponse(
     val message: String
 )

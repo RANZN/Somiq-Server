@@ -21,6 +21,9 @@ fun Application.authRoutes() {
             post("/forgot") {
                 authController.forgot(call)
             }
+            post("/refresh") {
+                authController.refresh(call)
+            }
             authenticate(JwtConfig.NAME) {
                 post("/logout") {
                     authController.logout(call)

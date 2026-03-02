@@ -61,4 +61,17 @@ class JwtTokenProvider(
             .sign(Algorithm.HMAC256(JwtConfig.SECRET))
     }
 
+    override fun getUserIdFromRefreshToken(refreshToken: String): String? {
+        return try {
+            val verifier = JWT
+                .require(Algorithm.HMAC256(JwtConfig.SECRET))
+                .withIssuer(JwtConfig.ISSUER)
+                .withAudience(JwtConfig.AUDIENCE)
+                .build()
+            verifier.verify(refreshToken).subject
+        } catch (_: Exception) {
+            null
+        }
+    }
+
 }

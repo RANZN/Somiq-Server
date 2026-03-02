@@ -5,4 +5,5 @@ import com.ranjan.domain.common.model.User
 
 interface TokenProvider {
     fun createToken(user: User): AuthToken
+    fun getUserIdFromRefreshToken(refreshToken: String): String?
 }

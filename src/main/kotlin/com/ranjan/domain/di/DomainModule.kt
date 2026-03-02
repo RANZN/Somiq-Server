@@ -6,6 +6,7 @@ import com.ranjan.domain.account.usecase.UpdateProfileUseCase
 import com.ranjan.domain.auth.usecase.ForgotPasswordUseCase
 import com.ranjan.domain.auth.usecase.LoginUserUseCase
 import com.ranjan.domain.auth.usecase.LogoutUseCase
+import com.ranjan.domain.auth.usecase.RefreshTokenUseCase
 import com.ranjan.domain.auth.usecase.SignUpUserUseCase
 import com.ranjan.domain.post.usecase.CreatePostUseCase
 import com.ranjan.domain.post.usecase.DeletePostUseCase
@@ -52,6 +53,7 @@ val domainModule = module {
     factoryOf(::SignUpUserUseCase)
     factoryOf(::ForgotPasswordUseCase)
     factoryOf(::LogoutUseCase)
+    factoryOf(::RefreshTokenUseCase)
 
     factoryOf(::CreatePostUseCase)
     factoryOf(::DeletePostUseCase)

@@ -1,25 +1,18 @@
 package com.ranjan.server.auth
 
-import com.ranjan.domain.auth.model.ErrorResponse
-import com.ranjan.domain.auth.model.ForgotPasswordRequest
-import com.ranjan.domain.auth.model.LoginRequest
-import com.ranjan.domain.auth.model.ResetPasswordRequest
-import com.ranjan.domain.auth.model.SignupRequest
-import com.ranjan.domain.auth.usecase.ForgotPasswordUseCase
-import com.ranjan.domain.auth.usecase.LoginUserUseCase
-import com.ranjan.domain.auth.usecase.LogoutUseCase
-import com.ranjan.domain.auth.usecase.SignUpUserUseCase
-import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.ApplicationCall
-import io.ktor.server.request.header
-import io.ktor.server.request.receive
-import io.ktor.server.response.respond
+import com.ranjan.domain.auth.model.*
+import com.ranjan.domain.auth.usecase.*
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
 
 class AuthController(
     private val loginUserUseCase: LoginUserUseCase,
     private val signupUserUseCase: SignUpUserUseCase,
     private val forgotPasswordUseCase: ForgotPasswordUseCase,
     private val logoutUseCase: LogoutUseCase,
+    private val refreshTokenUseCase: RefreshTokenUseCase,
 ) {
 
     suspend fun login(call: ApplicationCall) {
@@ -132,6 +125,41 @@ class AuthController(
         }
 
 
+    }
+    suspend fun refresh(call: ApplicationCall) {
+        val request = try {
+            call.receive<RefreshTokenRequest>()
+        } catch (_: Exception) {
+            call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid request format."))
+            return
+        }
+
+        val result = refreshTokenUseCase.execute(request.refreshToken)
+
+        result.onSuccess { token ->
+            call.respond(
+                HttpStatusCode.OK,
+                RefreshTokenResponse(
+                    accessToken = token.accessToken,
+                    refreshToken = token.refreshToken,
+                ),
+            )
+        }.onFailure { exception ->
+            when (exception) {
+                is SecurityException -> {
+                    call.respond(
+                        HttpStatusCode.Unauthorized,
+                        ErrorResponse(exception.message ?: "Invalid or expired refresh token"),
+                    )
+                }
+                else -> {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        ErrorResponse("An internal server error occurred."),
+                    )
+                }
+            }
+        }
     }
 
     suspend fun logout(call: ApplicationCall) {
