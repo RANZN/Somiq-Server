@@ -10,7 +10,9 @@ import com.ranjan.domain.auth.usecase.RefreshTokenUseCase
 import com.ranjan.domain.auth.usecase.SignUpUserUseCase
 import com.ranjan.domain.post.usecase.CreatePostUseCase
 import com.ranjan.domain.post.usecase.DeletePostUseCase
+import com.ranjan.domain.post.usecase.GetBookmarkedPostsUseCase
 import com.ranjan.domain.post.usecase.GetPostByIdUseCase
+import com.ranjan.domain.post.usecase.GetPostsByAuthorUseCase
 import com.ranjan.domain.post.usecase.GetPostsUseCase
 import com.ranjan.domain.post.usecase.ToggleBookmarkUseCase
 import com.ranjan.domain.post.usecase.ToggleLikeUseCase
@@ -43,6 +45,7 @@ import com.ranjan.domain.notification.usecase.MarkNotificationReadUseCase
 import com.ranjan.domain.story.usecase.CreateStoryUseCase
 import com.ranjan.domain.story.usecase.DeleteStoryUseCase
 import com.ranjan.domain.story.usecase.GetStoriesFeedUseCase
+import com.ranjan.domain.story.usecase.GetStoryUseCase
 import com.ranjan.domain.story.usecase.GetUserStoriesUseCase
 import com.ranjan.domain.story.usecase.RecordStoryViewUseCase
 import org.koin.core.module.dsl.factoryOf
@@ -57,7 +60,9 @@ val domainModule = module {
 
     factoryOf(::CreatePostUseCase)
     factoryOf(::DeletePostUseCase)
+    factoryOf(::GetBookmarkedPostsUseCase)
     factoryOf(::GetPostByIdUseCase)
+    factoryOf(::GetPostsByAuthorUseCase)
     factoryOf(::GetPostsUseCase)
     factoryOf(::ToggleBookmarkUseCase)
     factoryOf(::ToggleLikeUseCase)
@@ -88,6 +93,7 @@ val domainModule = module {
     factoryOf(::CreateStoryUseCase)
     factoryOf(::DeleteStoryUseCase)
     factoryOf(::GetStoriesFeedUseCase)
+    factoryOf(::GetStoryUseCase)
     factoryOf(::GetUserStoriesUseCase)
     factoryOf(::RecordStoryViewUseCase)
 

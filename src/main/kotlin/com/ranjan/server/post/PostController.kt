@@ -2,6 +2,7 @@ package com.ranjan.server.post
 
 import com.ranjan.domain.common.model.PaginationRequest
 import com.ranjan.domain.auth.model.ErrorResponse
+import com.ranjan.domain.exception.UnauthorizedException
 import com.ranjan.domain.post.model.*
 import com.ranjan.domain.post.usecase.*
 import com.ranjan.server.common.extension.userId
@@ -11,10 +12,13 @@ import io.ktor.server.application.ApplicationCall
 import io.ktor.server.plugins.NotFoundException
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
+import java.util.UUID
 
 class PostController(
     private val createPostUseCase: CreatePostUseCase,
     private val getPostsUseCase: GetPostsUseCase,
+    private val getPostsByAuthorUseCase: GetPostsByAuthorUseCase,
+    private val getBookmarkedPostsUseCase: GetBookmarkedPostsUseCase,
     private val getPostByIdUseCase: GetPostByIdUseCase,
     private val updatePostUseCase: UpdatePostUseCase,
     private val deletePostUseCase: DeletePostUseCase,
@@ -23,18 +27,38 @@ class PostController(
 ) {
 
     // ---------------------------------------------------------
-    // GET /v1/posts
+    // GET /v1/posts  (optional ?authorId= for user's posts)
+    // Page 1 (no "after" cursor): public. Other pages: auth required.
     // ---------------------------------------------------------
     suspend fun getPosts(call: ApplicationCall) {
-        val userId = call.userIdOrNull()
         val params = call.request.queryParameters
+        val isFirstPage = params["after"].isNullOrBlank()
+
+        val viewerId = if (isFirstPage) {
+            call.userIdOrNull()
+        } else {
+            runCatching { call.userId() }.getOrElse { throw UnauthorizedException() }
+        }
+
+        val authorIdParam = params["authorId"]
 
         val pagination = PaginationRequest(
             cursor = params["after"],
             limit = params["limit"]?.toIntOrNull() ?: 20
         )
 
-        val result = getPostsUseCase.execute(userId, pagination)
+        val result = when {
+            authorIdParam != null -> {
+                try {
+                    val authorId = UUID.fromString(authorIdParam)
+                    getPostsByAuthorUseCase.execute(authorId, viewerId, pagination)
+                } catch (_: Exception) {
+                    Result.failure(IllegalArgumentException("Invalid authorId"))
+                }
+            }
+
+            else -> getPostsUseCase.execute(viewerId, pagination)
+        }
 
         result.onSuccess {
             call.respond(HttpStatusCode.OK, it)
@@ -44,6 +68,28 @@ class PostController(
                 ErrorResponse("Failed to load posts")
             )
         }
+    }
+
+    // ---------------------------------------------------------
+    // GET /v1/posts/bookmarks  (AUTH REQUIRED)
+    // ---------------------------------------------------------
+    suspend fun getBookmarkedPosts(call: ApplicationCall) {
+        val userId = try {
+            call.userId()
+        } catch (_: Exception) {
+            call.respond(HttpStatusCode.Unauthorized, ErrorResponse("Login required"))
+            return
+        }
+        val params = call.request.queryParameters
+        val pagination = PaginationRequest(
+            cursor = params["after"],
+            limit = params["limit"]?.toIntOrNull() ?: 20
+        )
+        getBookmarkedPostsUseCase.execute(userId, pagination)
+            .onSuccess { call.respond(HttpStatusCode.OK, it) }
+            .onFailure {
+                call.respond(HttpStatusCode.InternalServerError, ErrorResponse("Failed to load bookmarked posts"))
+            }
     }
 
     // ---------------------------------------------------------

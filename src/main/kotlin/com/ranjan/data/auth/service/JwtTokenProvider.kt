@@ -11,10 +11,22 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 
 object JwtConfig {
-    const val NAME = "auth-jwt" //todo change all these constants to env variables
-    const val SECRET = "your-super-secret-for-jwt"
-    const val ISSUER = "your=issuer"
-    const val AUDIENCE = "your-audience"
+    const val NAME = "auth-jwt"
+
+    private fun env(name: String): String? = System.getenv(name)
+
+    /** JWT signing secret. Set JWT_SECRET in production; dev default only when unset. */
+    val SECRET: String
+        get() = env("JWT_SECRET")
+            ?: "DEV_ONLY_CHANGE_IN_PRODUCTION".also {
+                System.err.println("WARNING: JWT_SECRET not set. Using dev default. Set JWT_SECRET for production.")
+            }
+
+    /** JWT issuer. Override with JWT_ISSUER. */
+    val ISSUER: String get() = env("JWT_ISSUER") ?: "somiq-server"
+
+    /** JWT audience. Override with JWT_AUDIENCE. */
+    val AUDIENCE: String get() = env("JWT_AUDIENCE") ?: "somiq-app"
 
     object Claims {
         const val USER_ID = "userId"

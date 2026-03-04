@@ -4,7 +4,10 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.ranjan.data.auth.service.JwtConfig
 import com.ranjan.data.di.dataModule
+import com.ranjan.domain.auth.model.ErrorResponse
 import com.ranjan.domain.di.domainModule
+import com.ranjan.domain.exception.InvalidUserIdException
+import com.ranjan.domain.exception.UnauthorizedException
 import com.ranjan.server.configureRoutes
 import com.ranjan.server.di.appModule
 import io.ktor.http.*
@@ -71,6 +74,14 @@ fun Application.configureSecurity() {
 
 fun Application.configureExceptionHandling() {
     install(StatusPages) {
+        exception<InvalidUserIdException> { call, _ ->
+            call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid user ID"))
+        }
+
+        exception<UnauthorizedException> { call, _ ->
+            call.respond(HttpStatusCode.Unauthorized, ErrorResponse("Login required"))
+        }
+
         exception<Throwable> { call, cause ->
             call.respondText(
                 text = "500: ${cause.message}",

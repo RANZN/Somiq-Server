@@ -5,8 +5,8 @@ import com.ranjan.domain.account.usecase.GetProfileUseCase
 import com.ranjan.domain.account.usecase.ToggleFollowUseCase
 import com.ranjan.domain.account.usecase.UpdateProfileUseCase
 import com.ranjan.domain.auth.model.ErrorResponse
+import com.ranjan.server.common.extension.getUserIdAndViewerId
 import com.ranjan.server.common.extension.userId
-import com.ranjan.server.common.extension.userIdOrNull
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.plugins.NotFoundException
@@ -21,25 +21,7 @@ class AccountController(
 ) {
 
     suspend fun getProfile(call: ApplicationCall) {
-        val userIdParam = call.parameters["userId"]
-        val viewerId = call.userIdOrNull()
-
-        val userId = if (userIdParam != null) {
-            try {
-                UUID.fromString(userIdParam)
-            } catch (e: Exception) {
-                call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid user ID"))
-                return
-            }
-        } else {
-            // If no userId provided, return current user's profile
-            try {
-                call.userId()
-            } catch (_: Exception) {
-                call.respond(HttpStatusCode.Unauthorized, ErrorResponse("Login required"))
-                return
-            }
-        }
+        val (userId, viewerId) = call.getUserIdAndViewerId()
 
         val result = getProfileUseCase.execute(userId, viewerId)
 
@@ -104,7 +86,7 @@ class AccountController(
 
         val followingId = try {
             UUID.fromString(followingIdParam)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid user ID"))
             return
         }

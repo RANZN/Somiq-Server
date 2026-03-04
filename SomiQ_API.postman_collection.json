@@ -1,8 +1,8 @@
 {
 	"info": {
-		"_postman_id": "instagram-clone-api",
-		"name": "Instagram Clone API",
-		"description": "Complete API collection for Instagram clone application",
+		"_postman_id": "SomiQ-api",
+		"name": "SomiQ  API",
+		"description": "Complete API collection for SomiQ  application",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -819,9 +819,9 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/v1/stories/user",
+							"raw": "{{base_url}}/v1/stories/me",
 							"host": ["{{base_url}}"],
-							"path": ["v1", "stories", "user"]
+							"path": ["v1", "stories", "me"]
 						}
 					},
 					"response": []

@@ -35,7 +35,7 @@ class AccountRepositoryImpl(
             reelsCount = getReelsCount(userId),
             followersCount = getFollowersCount(userId),
             followingCount = getFollowingCount(userId),
-            isFollowing = viewerId?.let { isFollowing(it, userId) } ?: false
+            isFollowing = if (userId == viewerId) true else viewerId?.let { isFollowing(it, userId) } ?: false
         )
     }
 

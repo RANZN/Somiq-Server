@@ -3,7 +3,7 @@ kotlin = "2.2.20"
 ktor = "3.3.0"
 logback = "1.5.13"
 exposed = "0.56.0"
-h2 = "2.1.214"
+h2 = "2.2.220"
 hikaricp = "5.0.1"
 jwt = "4.4.0"
 jbcrypt = "0.4"
@@ -13,6 +13,7 @@ postgresql = "42.7.2"
 [libraries]
 ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
+ktor-server-io = { module = "io.ktor:ktor-io", version.ref = "ktor" }
 ktor-server-config-yaml = { module = "io.ktor:ktor-server-config-yaml", version.ref = "ktor" }
 ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref = "ktor" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }

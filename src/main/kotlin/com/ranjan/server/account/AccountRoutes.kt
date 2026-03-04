@@ -14,7 +14,9 @@ fun Application.accountRoutes() {
     val accountController by inject<AccountController>()
     routing {
         route("/v1/account") {
-            get { accountController.getProfile(call) }
+            authenticate(JwtConfig.NAME) {
+                get { accountController.getProfile(call) }
+            }
             get("/{userId}") { accountController.getProfile(call) }
 
             authenticate(JwtConfig.NAME) {

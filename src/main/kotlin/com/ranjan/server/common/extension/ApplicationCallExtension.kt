@@ -1,10 +1,12 @@
 package com.ranjan.server.common.extension
 
 import com.ranjan.data.auth.service.JwtConfig
-import io.ktor.server.application.ApplicationCall
-import io.ktor.server.auth.jwt.JWTPrincipal
-import io.ktor.server.auth.principal
-import java.util.UUID
+import com.ranjan.domain.exception.InvalidUserIdException
+import com.ranjan.domain.exception.UnauthorizedException
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
+import java.util.*
 
 fun ApplicationCall.userId(): UUID {
     val principal = this.principal<JWTPrincipal>()
@@ -30,4 +32,17 @@ fun ApplicationCall.userIdOrNull(): UUID? {
     } catch (_: IllegalArgumentException) {
         null
     }
+}
+
+fun ApplicationCall.getUserIdAndViewerId(): Pair<UUID, UUID?> {
+
+    val viewerId = userIdOrNull()
+
+    val userId = parameters["userId"]?.let {
+        runCatching { UUID.fromString(it) }
+            .getOrElse { throw InvalidUserIdException() }
+    } ?: runCatching { userId() }
+        .getOrElse { throw UnauthorizedException() }
+
+    return userId to viewerId
 }

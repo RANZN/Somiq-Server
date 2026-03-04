@@ -20,6 +20,17 @@ interface PostRepository {
         pagination: PaginationRequest
     ): PaginationResult<PostResponse>
 
+    suspend fun getPostsByAuthor(
+        authorId: UUID,
+        viewerId: UUID?,
+        pagination: PaginationRequest
+    ): PaginationResult<PostResponse>
+
+    suspend fun getBookmarkedPosts(
+        userId: UUID,
+        pagination: PaginationRequest
+    ): PaginationResult<PostResponse>
+
     suspend fun getPostById(id: String): PostResponse?
 
     suspend fun updatePost(

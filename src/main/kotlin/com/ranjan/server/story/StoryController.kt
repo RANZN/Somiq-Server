@@ -4,17 +4,18 @@ import com.ranjan.domain.auth.model.ErrorResponse
 import com.ranjan.domain.common.model.PaginationRequest
 import com.ranjan.domain.story.model.CreateStoryRequest
 import com.ranjan.domain.story.usecase.*
+import com.ranjan.server.common.extension.getUserIdAndViewerId
 import com.ranjan.server.common.extension.userId
 import com.ranjan.server.common.extension.userIdOrNull
-import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.ApplicationCall
-import io.ktor.server.request.receive
-import io.ktor.server.response.respond
-import java.util.UUID
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
 
 class StoryController(
     private val createStoryUseCase: CreateStoryUseCase,
     private val getStoriesFeedUseCase: GetStoriesFeedUseCase,
+    private val getStoryUseCase: GetStoryUseCase,
     private val getUserStoriesUseCase: GetUserStoriesUseCase,
     private val deleteStoryUseCase: DeleteStoryUseCase,
     private val recordStoryViewUseCase: RecordStoryViewUseCase,
@@ -41,26 +42,30 @@ class StoryController(
         }
     }
 
-    suspend fun getUserStories(call: ApplicationCall) {
-        val userIdParam = call.parameters["userId"]
-        val viewerId = call.userIdOrNull()
-
-        val userId = if (userIdParam != null) {
-            try {
-                UUID.fromString(userIdParam)
-            } catch (e: Exception) {
-                call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid user ID"))
-                return
-            }
-        } else {
-            try {
-                call.userId()
-            } catch (_: Exception) {
-                call.respond(HttpStatusCode.Unauthorized, ErrorResponse("Login required"))
-                return
-            }
+    suspend fun getStory(call: ApplicationCall) {
+        val storyId = call.parameters["storyId"]
+        if (storyId.isNullOrEmpty()) {
+            call.respond(HttpStatusCode.BadRequest, ErrorResponse("Story id required"))
+            return
         }
+        val viewerId = call.userIdOrNull()
+        val result = getStoryUseCase.execute(storyId, viewerId)
+        result.onSuccess { story ->
+            if (story != null) {
+                call.respond(HttpStatusCode.OK, story)
+            } else {
+                call.respond(HttpStatusCode.NotFound, ErrorResponse("Story not found"))
+            }
+        }.onFailure {
+            call.respond(
+                HttpStatusCode.InternalServerError,
+                ErrorResponse("Failed to load story")
+            )
+        }
+    }
 
+    suspend fun getUserStories(call: ApplicationCall) {
+        val (userId, viewerId) = call.getUserIdAndViewerId()
         val result = getUserStoriesUseCase.execute(userId, viewerId)
 
         result.onSuccess {
@@ -104,9 +109,7 @@ class StoryController(
     }
 
     suspend fun deleteStory(call: ApplicationCall) {
-        val userId = try {
-            call.userId()
-        } catch (_: Exception) {
+        val userId = call.userIdOrNull() ?: run {
             call.respond(HttpStatusCode.Unauthorized, ErrorResponse("Login required"))
             return
         }
@@ -130,9 +133,7 @@ class StoryController(
     }
 
     suspend fun recordView(call: ApplicationCall) {
-        val userId = try {
-            call.userId()
-        } catch (_: Exception) {
+        val userId = call.userIdOrNull() ?: run {
             call.respond(HttpStatusCode.Unauthorized, ErrorResponse("Login required"))
             return
         }

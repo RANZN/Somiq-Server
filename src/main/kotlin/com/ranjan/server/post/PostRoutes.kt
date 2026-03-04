@@ -21,6 +21,7 @@ fun Application.postRoutes() {
 
             // Requires Auth
             authenticate(JwtConfig.NAME) {
+                get("bookmarks") { postController.getBookmarkedPosts(call) }
                 post { postController.createPost(call) }
                 put("/{id}") { postController.updatePost(call) }
                 delete("/{id}") { postController.deletePost(call) }

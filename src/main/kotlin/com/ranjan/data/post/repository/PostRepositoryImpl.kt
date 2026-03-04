@@ -126,6 +126,103 @@ class PostRepositoryImpl(
         PaginationResult(items, nextCursor)
     }
 
+    override suspend fun getPostsByAuthor(
+        authorId: UUID,
+        viewerId: UUID?,
+        pagination: PaginationRequest
+    ): PaginationResult<PostResponse> = db.dbQuery {
+        var query = PostTable.selectAll()
+            .where { PostTable.authorId eq authorId }
+            .orderBy(PostTable.createdAt, SortOrder.DESC)
+
+        pagination.cursor?.toLongOrNull()?.let { after ->
+            query = query.andWhere { PostTable.createdAt less after }
+        }
+
+        val postIds = query.limit(pagination.limit).map { it[PostTable.postId] }
+        if (postIds.isEmpty()) return@dbQuery PaginationResult(emptyList(), null)
+
+        val postData = PostTable.selectAll().where { PostTable.postId inList postIds }.associateBy { it[PostTable.postId] }
+        val likesCounts = PostLikeTable.select(PostLikeTable.postId, PostLikeTable.postId.count())
+            .where { PostLikeTable.postId inList postIds }.groupBy(PostLikeTable.postId)
+            .associate { row -> row[PostLikeTable.postId] to row[PostLikeTable.postId.count()] }
+        val bookmarksCounts = PostBookmarkTable.select(PostBookmarkTable.postId, PostBookmarkTable.postId.count())
+            .where { PostBookmarkTable.postId inList postIds }.groupBy(PostBookmarkTable.postId)
+            .associate { row -> row[PostBookmarkTable.postId] to row[PostBookmarkTable.postId.count()] }
+        val userLikes = viewerId?.let { it ->
+            PostLikeTable.selectAll().where { (PostLikeTable.userId eq it) and (PostLikeTable.postId inList postIds) }
+                .map { it[PostLikeTable.postId] }.toSet()
+        } ?: emptySet()
+        val userBookmarks = viewerId?.let {
+            PostBookmarkTable.selectAll()
+                .where { (PostBookmarkTable.userId eq it) and (PostBookmarkTable.postId inList postIds) }
+                .map { it[PostBookmarkTable.postId] }.toSet()
+        } ?: emptySet()
+        val authorIds = postData.values.map { it[PostTable.authorId] }.distinct()
+        val authors = UserTable.selectAll().where { UserTable.userId inList authorIds }.associateBy { it[UserTable.userId] }
+        val items = postIds.map { postId ->
+            val row = postData[postId]!!
+            val author = authors[row[PostTable.authorId]]!!
+            PostResponse(
+                postId = postId, title = row[PostTable.title], content = row[PostTable.content],
+                mediaUrls = row[PostTable.mediaUrls].toMediaUrls(), authorId = row[PostTable.authorId],
+                authorName = author[UserTable.name], authorUsername = author[UserTable.username],
+                authorProfilePictureUrl = author[UserTable.profilePictureUrl],
+                createdAt = row[PostTable.createdAt], updatedAt = row[PostTable.updatedAt],
+                likesCount = likesCounts[postId] ?: 0, bookmarksCount = bookmarksCounts[postId] ?: 0,
+                isLiked = postId in userLikes, isBookmarked = postId in userBookmarks
+            )
+        }
+        PaginationResult(items, items.lastOrNull()?.createdAt?.toString())
+    }
+
+    override suspend fun getBookmarkedPosts(
+        userId: UUID,
+        pagination: PaginationRequest
+    ): PaginationResult<PostResponse> = db.dbQuery {
+        var query = (PostBookmarkTable innerJoin PostTable)
+            .select(PostTable.postId, PostTable.createdAt)
+            .where { PostBookmarkTable.userId eq userId }
+            .orderBy(PostTable.createdAt, SortOrder.DESC)
+
+        pagination.cursor?.toLongOrNull()?.let { after ->
+            query = query.andWhere { PostTable.createdAt less after }
+        }
+
+        val postIds = query.limit(pagination.limit).map { it[PostTable.postId] }
+        if (postIds.isEmpty()) return@dbQuery PaginationResult(emptyList(), null)
+
+        val postData = PostTable.selectAll().where { PostTable.postId inList postIds }.associateBy { it[PostTable.postId] }
+        val likesCounts = PostLikeTable.select(PostLikeTable.postId, PostLikeTable.postId.count())
+            .where { PostLikeTable.postId inList postIds }.groupBy(PostLikeTable.postId)
+            .associate { row -> row[PostLikeTable.postId] to row[PostLikeTable.postId.count()] }
+        val bookmarksCounts = PostBookmarkTable.select(PostBookmarkTable.postId, PostBookmarkTable.postId.count())
+            .where { PostBookmarkTable.postId inList postIds }.groupBy(PostBookmarkTable.postId)
+            .associate { row -> row[PostBookmarkTable.postId] to row[PostBookmarkTable.postId.count()] }
+        val userLikes = PostLikeTable.selectAll()
+            .where { (PostLikeTable.userId eq userId) and (PostLikeTable.postId inList postIds) }
+            .map { it[PostLikeTable.postId] }.toSet()
+        val userBookmarks = PostBookmarkTable.selectAll()
+            .where { (PostBookmarkTable.userId eq userId) and (PostBookmarkTable.postId inList postIds) }
+            .map { it[PostBookmarkTable.postId] }.toSet()
+        val authorIds = postData.values.map { it[PostTable.authorId] }.distinct()
+        val authors = UserTable.selectAll().where { UserTable.userId inList authorIds }.associateBy { it[UserTable.userId] }
+        val items = postIds.map { postId ->
+            val row = postData[postId]!!
+            val author = authors[row[PostTable.authorId]]!!
+            PostResponse(
+                postId = postId, title = row[PostTable.title], content = row[PostTable.content],
+                mediaUrls = row[PostTable.mediaUrls].toMediaUrls(), authorId = row[PostTable.authorId],
+                authorName = author[UserTable.name], authorUsername = author[UserTable.username],
+                authorProfilePictureUrl = author[UserTable.profilePictureUrl],
+                createdAt = row[PostTable.createdAt], updatedAt = row[PostTable.updatedAt],
+                likesCount = likesCounts[postId] ?: 0, bookmarksCount = bookmarksCounts[postId] ?: 0,
+                isLiked = postId in userLikes, isBookmarked = postId in userBookmarks
+            )
+        }
+        PaginationResult(items, items.lastOrNull()?.createdAt?.toString())
+    }
+
     // ------------------------------
     // GET POST BY ID
     // ------------------------------

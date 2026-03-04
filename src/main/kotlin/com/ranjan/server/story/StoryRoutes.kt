@@ -14,11 +14,11 @@ fun Application.storyRoutes() {
     val storyController by inject<StoryController>()
     routing {
         route("/v1/stories") {
-            get { storyController.getStoriesFeed(call) }
-            get("/user/{userId}") { storyController.getUserStories(call) }
-            get("/user") { storyController.getUserStories(call) }
-
             authenticate(JwtConfig.NAME) {
+                get { storyController.getStoriesFeed(call) }
+                get("/me") { storyController.getUserStories(call) }
+                get("/user/{userId}") { storyController.getUserStories(call) }
+                get("/{storyId}") { storyController.getStory(call) }
                 post { storyController.createStory(call) }
                 delete("/{storyId}") { storyController.deleteStory(call) }
                 post("/{storyId}/view") { storyController.recordView(call) }

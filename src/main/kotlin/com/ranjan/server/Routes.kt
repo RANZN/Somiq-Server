@@ -4,6 +4,7 @@ import com.ranjan.server.account.accountRoutes
 import com.ranjan.server.auth.authRoutes
 import com.ranjan.server.collection.collectionRoutes
 import com.ranjan.server.comment.commentRoutes
+import com.ranjan.server.media.mediaRoutes
 import com.ranjan.server.notification.notificationRoutes
 import com.ranjan.server.post.postRoutes
 import com.ranjan.server.reel.reelRoutes
@@ -15,6 +16,7 @@ import io.ktor.server.application.Application
 fun Application.configureRoutes() {
     checkUpdateRoute()
     authRoutes()
+    mediaRoutes()
     postRoutes()
     reelRoutes()
     commentRoutes()

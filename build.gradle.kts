@@ -33,6 +33,7 @@ dependencies {
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.server.cors)
     implementation(libs.ktor.server.status.pages)
+    implementation(libs.ktor.server.io)
     implementation(libs.auth0.jwt)
     implementation(libs.jbcrypt)
 
