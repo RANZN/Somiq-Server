@@ -1,10 +1,10 @@
 package com.ranjan.domain.reel.usecase
 
-import com.ranjan.domain.common.exceptions.ForbiddenException
+import com.ranjan.domain.exception.ForbiddenException
 import com.ranjan.domain.reel.model.ReelResponse
 import com.ranjan.domain.reel.model.UpdateReelRequest
 import com.ranjan.domain.reel.repository.ReelRepository
-import io.ktor.server.plugins.NotFoundException
+import com.ranjan.domain.exception.ResourceNotFoundException
 import java.util.UUID
 
 class UpdateReelUseCase(
@@ -16,7 +16,7 @@ class UpdateReelUseCase(
         request: UpdateReelRequest
     ): Result<ReelResponse> = runCatching {
         val existing = reelRepository.getReelById(reelId)
-            ?: throw NotFoundException("Reel not found")
+            ?: throw ResourceNotFoundException("Reel not found")
 
         if (existing.authorId != userId) {
             throw ForbiddenException("You can only update your own reels")

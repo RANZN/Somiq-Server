@@ -15,7 +15,7 @@ import com.ranjan.domain.post.model.PostResponse
 import com.ranjan.domain.post.model.ToggleResponse
 import com.ranjan.domain.post.model.UpdatePostRequest
 import com.ranjan.domain.post.repository.PostRepository
-import io.ktor.server.plugins.*
+import com.ranjan.domain.exception.ResourceNotFoundException
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.selectAll
@@ -237,7 +237,7 @@ class PostRepositoryImpl(
     // ------------------------------
     override suspend fun updatePost(postId: String, request: UpdatePostRequest): PostResponse = db.dbQuery {
         val existing = PostTable.selectAll().where { PostTable.postId eq postId }.singleOrNull()
-            ?: throw NotFoundException("Post not found")
+            ?: throw ResourceNotFoundException("Post not found")
 
         PostTable.update({ PostTable.postId eq postId }) { row ->
             row[title] = request.title ?: existing[PostTable.title]

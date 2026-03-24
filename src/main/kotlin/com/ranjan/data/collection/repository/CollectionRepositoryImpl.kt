@@ -7,7 +7,7 @@ import com.ranjan.data.util.TimeProvider
 import org.jetbrains.exposed.sql.Database
 import com.ranjan.domain.collection.model.*
 import com.ranjan.domain.collection.repository.CollectionRepository
-import io.ktor.server.plugins.NotFoundException
+import com.ranjan.domain.exception.ResourceNotFoundException
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import java.util.UUID
@@ -75,7 +75,7 @@ class CollectionRepositoryImpl(
     override suspend fun updateCollection(collectionId: String, userId: UUID, name: String?, description: String?): CollectionResponse = db.dbQuery {
         val existing = CollectionTable.selectAll()
             .where { (CollectionTable.collectionId eq collectionId) and (CollectionTable.userId eq userId) }
-            .singleOrNull() ?: throw NotFoundException("Collection not found")
+            .singleOrNull() ?: throw ResourceNotFoundException("Collection not found")
 
         CollectionTable.update({ CollectionTable.collectionId eq collectionId }) { row ->
             row[CollectionTable.name] = name ?: existing[CollectionTable.name]
@@ -92,7 +92,7 @@ class CollectionRepositoryImpl(
                 .where { (CollectionTable.collectionId eq collectionId) and (CollectionTable.userId eq userId) }
                 .any()
 
-            if (!exists) throw NotFoundException("Collection not found")
+            if (!exists) throw ResourceNotFoundException("Collection not found")
 
             CollectionItemTable.deleteWhere { CollectionItemTable.collectionId eq collectionId }
             CollectionTable.deleteWhere { CollectionTable.collectionId eq collectionId }
@@ -103,7 +103,7 @@ class CollectionRepositoryImpl(
         // Verify collection belongs to user
         CollectionTable.selectAll()
             .where { (CollectionTable.collectionId eq collectionId) and (CollectionTable.userId eq userId) }
-            .singleOrNull() ?: throw NotFoundException("Collection not found")
+            .singleOrNull() ?: throw ResourceNotFoundException("Collection not found")
 
         // Check if item already exists
         val existing = CollectionItemTable.selectAll()
@@ -146,7 +146,7 @@ class CollectionRepositoryImpl(
             // Verify collection belongs to user
             CollectionTable.selectAll()
                 .where { (CollectionTable.collectionId eq collectionId) and (CollectionTable.userId eq userId) }
-                .singleOrNull() ?: throw NotFoundException("Collection not found")
+                .singleOrNull() ?: throw ResourceNotFoundException("Collection not found")
 
             CollectionItemTable.deleteWhere { CollectionItemTable.itemId eq itemId }
 
@@ -161,7 +161,7 @@ class CollectionRepositoryImpl(
         // Verify collection belongs to user
         CollectionTable.selectAll()
             .where { (CollectionTable.collectionId eq collectionId) and (CollectionTable.userId eq userId) }
-            .singleOrNull() ?: throw NotFoundException("Collection not found")
+            .singleOrNull() ?: throw ResourceNotFoundException("Collection not found")
 
         CollectionItemTable.selectAll()
             .where { CollectionItemTable.collectionId eq collectionId }

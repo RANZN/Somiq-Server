@@ -20,6 +20,8 @@ object DataSourceProvider {
 
         transaction(database) {
             SchemaUtils.create(*AllTables.toTypedArray())
+            // Keep schema in sync for local/dev DBs when new columns are introduced.
+            SchemaUtils.createMissingTablesAndColumns(*AllTables.toTypedArray())
         }
         return database
     }

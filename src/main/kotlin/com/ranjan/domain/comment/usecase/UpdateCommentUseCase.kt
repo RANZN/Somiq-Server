@@ -3,8 +3,8 @@ package com.ranjan.domain.comment.usecase
 import com.ranjan.domain.comment.model.CommentResponse
 import com.ranjan.domain.comment.model.UpdateCommentRequest
 import com.ranjan.domain.comment.repository.CommentRepository
-import com.ranjan.domain.common.exceptions.ForbiddenException
-import io.ktor.server.plugins.NotFoundException
+import com.ranjan.domain.exception.ForbiddenException
+import com.ranjan.domain.exception.ResourceNotFoundException
 import java.util.UUID
 
 class UpdateCommentUseCase(
@@ -16,7 +16,7 @@ class UpdateCommentUseCase(
         request: UpdateCommentRequest
     ): Result<CommentResponse> = runCatching {
         val existing = commentRepository.getCommentById(commentId, userId)
-            ?: throw NotFoundException("Comment not found")
+            ?: throw ResourceNotFoundException("Comment not found")
 
         if (existing.authorId != userId) {
             throw ForbiddenException("You can only update your own comments")

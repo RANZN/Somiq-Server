@@ -35,7 +35,6 @@ dependencies {
     implementation(libs.ktor.server.status.pages)
     implementation(libs.ktor.server.io)
     implementation(libs.auth0.jwt)
-    implementation(libs.jbcrypt)
 
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)

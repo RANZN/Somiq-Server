@@ -15,7 +15,7 @@ import com.ranjan.domain.reel.model.CreateReelRequest
 import com.ranjan.domain.reel.model.ReelResponse
 import com.ranjan.domain.reel.model.UpdateReelRequest
 import com.ranjan.domain.reel.repository.ReelRepository
-import io.ktor.server.plugins.NotFoundException
+import com.ranjan.domain.exception.ResourceNotFoundException
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import java.util.*
@@ -126,7 +126,7 @@ class ReelRepositoryImpl(
 
     override suspend fun updateReel(reelId: String, request: UpdateReelRequest): ReelResponse = db.dbQuery {
         val existing = ReelTable.selectAll().where { ReelTable.reelId eq reelId }.singleOrNull()
-            ?: throw NotFoundException("Reel not found")
+            ?: throw ResourceNotFoundException("Reel not found")
 
         ReelTable.update({ ReelTable.reelId eq reelId }) { row ->
             row[ReelTable.title] = request.title ?: existing[ReelTable.title]

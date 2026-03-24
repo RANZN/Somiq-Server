@@ -6,8 +6,11 @@ import com.ranjan.data.auth.service.JwtConfig
 import com.ranjan.data.di.dataModule
 import com.ranjan.domain.auth.model.ErrorResponse
 import com.ranjan.domain.di.domainModule
+import com.ranjan.domain.exception.ForbiddenException
 import com.ranjan.domain.exception.InvalidUserIdException
+import com.ranjan.domain.exception.ResourceNotFoundException
 import com.ranjan.domain.exception.UnauthorizedException
+import com.ranjan.domain.exception.ValidationException
 import com.ranjan.server.configureRoutes
 import com.ranjan.server.di.appModule
 import io.ktor.http.*
@@ -80,6 +83,27 @@ fun Application.configureExceptionHandling() {
 
         exception<UnauthorizedException> { call, _ ->
             call.respond(HttpStatusCode.Unauthorized, ErrorResponse("Login required"))
+        }
+
+        exception<ResourceNotFoundException> { call, cause ->
+            call.respond(
+                HttpStatusCode.NotFound,
+                ErrorResponse(cause.message ?: "Not found")
+            )
+        }
+
+        exception<ForbiddenException> { call, cause ->
+            call.respond(
+                HttpStatusCode.Forbidden,
+                ErrorResponse(cause.message ?: "Forbidden")
+            )
+        }
+
+        exception<ValidationException> { call, cause ->
+            call.respond(
+                HttpStatusCode.BadRequest,
+                ErrorResponse(cause.message ?: "Invalid request")
+            )
         }
 
         exception<Throwable> { call, cause ->

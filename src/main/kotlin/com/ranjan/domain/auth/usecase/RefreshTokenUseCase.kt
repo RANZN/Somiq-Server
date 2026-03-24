@@ -15,18 +15,20 @@ class RefreshTokenUseCase(
     suspend fun execute(refreshToken: String): Result<AuthToken> = runCatching {
         val userId = tokenProvider.getUserIdFromRefreshToken(refreshToken)
             ?: throw SecurityException("Invalid or expired refresh token")
+        val deviceId = tokenProvider.getDeviceIdFromRefreshToken(refreshToken)
+            ?: throw SecurityException("Invalid or expired refresh token")
 
-        if (!refreshTokenRepo.findByToken(userId, refreshToken)) {
-            throw SecurityException("Refresh token not found or revoked")
+        if (!refreshTokenRepo.findByToken(userId, refreshToken, deviceId)) {
+            throw SecurityException("Unauthorized device for refresh token")
         }
 
         val user = userRepository.findById(UUID.fromString(userId))
             ?: throw SecurityException("User not found")
 
-        val newTokens = tokenProvider.createToken(user)
+        val newTokens = tokenProvider.createToken(user, deviceId)
 
         refreshTokenRepo.deleteByToken(refreshToken)
-        refreshTokenRepo.save(userId, newTokens.refreshToken)
+        refreshTokenRepo.save(userId, newTokens.refreshToken, deviceId)
 
         newTokens
     }

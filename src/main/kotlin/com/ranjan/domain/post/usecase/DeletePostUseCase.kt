@@ -1,8 +1,8 @@
 package com.ranjan.domain.post.usecase
 
-import com.ranjan.domain.common.exceptions.ForbiddenException
+import com.ranjan.domain.exception.ForbiddenException
 import com.ranjan.domain.post.repository.PostRepository
-import io.ktor.server.plugins.NotFoundException
+import com.ranjan.domain.exception.ResourceNotFoundException
 import java.util.UUID
 
 class DeletePostUseCase(
@@ -14,7 +14,7 @@ class DeletePostUseCase(
     ): Result<Unit> = runCatching {
 
         val post = postRepository.getPostById(postId)
-            ?: throw NotFoundException("Post not found")
+            ?: throw ResourceNotFoundException("Post not found")
 
         if (post.authorId != userId) {
             throw ForbiddenException("You cannot delete this post")

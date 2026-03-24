@@ -8,16 +8,16 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 
 class AuthController(
-    private val loginUserUseCase: LoginUserUseCase,
-    private val signupUserUseCase: SignUpUserUseCase,
-    private val forgotPasswordUseCase: ForgotPasswordUseCase,
+    private val verifyOtpUseCase: VerifyOtpUseCase,
+    private val completeSignUpUseCase: CompleteSignUpUseCase,
+    private val checkUserIdAvailabilityUseCase: CheckUserIdAvailabilityUseCase,
     private val logoutUseCase: LogoutUseCase,
     private val refreshTokenUseCase: RefreshTokenUseCase,
 ) {
 
-    suspend fun login(call: ApplicationCall) {
-        val loginRequest = try {
-            call.receive<LoginRequest>()
+    suspend fun verifyOtp(call: ApplicationCall) {
+        val request = try {
+            call.receive<VerifyOtpRequest>()
         } catch (_: Exception) {
             call.respond(
                 HttpStatusCode.BadRequest,
@@ -26,17 +26,33 @@ class AuthController(
             return
         }
 
-        val result = loginUserUseCase.execute(loginRequest)
+        val result = verifyOtpUseCase.execute(request)
 
-        result.onSuccess { authResponse ->
-            call.respond(HttpStatusCode.OK, authResponse)
+        result.onSuccess { response ->
+            call.respond(HttpStatusCode.OK, response)
         }
         result.onFailure { exception ->
             when (exception) {
                 is SecurityException -> {
+                    val message = exception.message ?: "Invalid credentials"
+                    val status = when (message) {
+                        "INVALID_OTP" -> HttpStatusCode.Unauthorized
+                        "ACCOUNT_NOT_FOUND" -> HttpStatusCode.NotFound
+                        else -> HttpStatusCode.Unauthorized
+                    }
+                    val publicMessage = when (message) {
+                        "INVALID_OTP" -> "Incorrect OTP"
+                        "ACCOUNT_NOT_FOUND" -> "Account not found"
+                        else -> "Invalid credentials"
+                    }
+                    call.respond(status, ErrorResponse(publicMessage))
+                }
+
+                is IllegalStateException -> {
+                    val errorMessage = exception.message ?: "Conflict"
                     call.respond(
-                        HttpStatusCode.Unauthorized,
-                        ErrorResponse(exception.message ?: "Invalid credentials")
+                        HttpStatusCode.Conflict,
+                        ErrorResponse(errorMessage)
                     )
                 }
 
@@ -50,9 +66,15 @@ class AuthController(
         }
     }
 
-    suspend fun signup(call: ApplicationCall) {
-        val signUpRequest = try {
-            call.receive<SignupRequest>()
+    suspend fun completeSignup(call: ApplicationCall) {
+        val signupToken = call.request.header("Authorization")?.removePrefix("Bearer ")?.trim()
+            ?: run {
+                call.respond(HttpStatusCode.BadRequest, ErrorResponse("Missing signup token"))
+                return
+            }
+
+        val body = try {
+            call.receive<CompleteSignupRequest>()
         } catch (_: Exception) {
             call.respond(
                 HttpStatusCode.BadRequest,
@@ -61,18 +83,24 @@ class AuthController(
             return
         }
 
-        val result = signupUserUseCase.execute(signUpRequest)
+        val result = completeSignUpUseCase.execute(signupToken, body)
 
         result.onSuccess { authResponse ->
             call.respond(HttpStatusCode.Created, authResponse)
         }
-
         result.onFailure { exception ->
             when (exception) {
                 is SecurityException -> {
                     call.respond(
+                        HttpStatusCode.Unauthorized,
+                        ErrorResponse(exception.message ?: "Invalid signup token")
+                    )
+                }
+
+                is IllegalArgumentException -> {
+                    call.respond(
                         HttpStatusCode.BadRequest,
-                        ErrorResponse(exception.message ?: "Invalid credentials")
+                        ErrorResponse(exception.message ?: "Invalid signup data")
                     )
                 }
 
@@ -94,9 +122,9 @@ class AuthController(
         }
     }
 
-    suspend fun forgot(call: ApplicationCall) {
+    suspend fun checkUserId(call: ApplicationCall) {
         val request = try {
-            call.receive<ForgotPasswordRequest>()
+            call.receive<CheckUserIdRequest>()
         } catch (_: Exception) {
             call.respond(
                 HttpStatusCode.BadRequest,
@@ -105,27 +133,30 @@ class AuthController(
             return
         }
 
-        forgotPasswordUseCase.execute(request.email)
+        val result = checkUserIdAvailabilityUseCase.execute(request.userId)
 
-        call.respond(
-            HttpStatusCode.OK,
-            mapOf("message" to "If an account with that email exists, a password reset link has been sent.")
-        )
-    }
-
-    suspend fun resetPassword(call: ApplicationCall) {
-        val request = try {
-            call.receive<ResetPasswordRequest>()
-        } catch (_: Exception) {
-            call.respond(
-                HttpStatusCode.BadRequest,
-                ErrorResponse("Invalid request format.")
-            )
-            return
+        result.onSuccess { available ->
+            call.respond(HttpStatusCode.OK, CheckUserIdResponse(available))
         }
+        result.onFailure { exception ->
+            when (exception) {
+                is IllegalArgumentException -> {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(exception.message ?: "Invalid user id")
+                    )
+                }
 
-
+                else -> {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        ErrorResponse("An internal server error occurred.")
+                    )
+                }
+            }
+        }
     }
+
     suspend fun refresh(call: ApplicationCall) {
         val request = try {
             call.receive<RefreshTokenRequest>()

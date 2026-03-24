@@ -4,28 +4,43 @@ import com.ranjan.domain.common.model.UserResponse
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class LoginRequest(
-    val email: String,
-    val password: String
+data class VerifyOtpRequest(
+    val phone: String,
+    val otp: String,
+    val deviceId: String,
 )
 
 @Serializable
-data class SignupRequest(
+enum class OtpVerifyStatus {
+    LOGGED_IN,
+    SIGNUP_REQUIRED,
+}
+
+@Serializable
+data class VerifyOtpResponse(
+    val status: OtpVerifyStatus,
+    val token: AuthToken? = null,
+    val user: UserResponse? = null,
+    val signupToken: String? = null,
+)
+
+@Serializable
+data class CompleteSignupRequest(
     val name: String,
-    val username: String,
-    val email: String,
-    val password: String
+    /** Public handle (username); must be unique. */
+    val userId: String,
+    val email: String? = null,
+    val profilePictureUrl: String? = null,
 )
 
 @Serializable
-data class ForgotPasswordRequest(
-    val email: String
+data class CheckUserIdRequest(
+    val userId: String,
 )
 
 @Serializable
-data class ResetPasswordRequest(
-    val token: String,
-    val newPassword: String
+data class CheckUserIdResponse(
+    val available: Boolean,
 )
 
 @Serializable
@@ -49,3 +64,8 @@ data class RefreshTokenResponse(
 data class ErrorResponse(
     val message: String
 )
+
+/** Optional dev bypass code; see `otp.devBypassCode` in server config. */
+object OtpConfig {
+    const val DEV_OTP = "000000"
+}

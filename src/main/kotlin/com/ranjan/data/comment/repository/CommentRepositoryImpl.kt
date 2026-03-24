@@ -12,7 +12,7 @@ import com.ranjan.domain.comment.model.UpdateCommentRequest
 import com.ranjan.domain.comment.repository.CommentRepository
 import com.ranjan.domain.common.model.PaginationRequest
 import com.ranjan.domain.common.model.PaginationResult
-import io.ktor.server.plugins.NotFoundException
+import com.ranjan.domain.exception.ResourceNotFoundException
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import java.util.*
@@ -124,7 +124,7 @@ class CommentRepositoryImpl(
 
     override suspend fun updateComment(commentId: String, request: UpdateCommentRequest): CommentResponse = db.dbQuery {
         CommentTable.selectAll().where { CommentTable.commentId eq commentId }.singleOrNull()
-            ?: throw NotFoundException("Comment not found")
+            ?: throw ResourceNotFoundException("Comment not found")
 
         CommentTable.update({ CommentTable.commentId eq commentId }) { row ->
             row[CommentTable.content] = request.content

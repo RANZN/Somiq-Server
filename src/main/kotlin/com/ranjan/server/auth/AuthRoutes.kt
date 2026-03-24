@@ -12,14 +12,14 @@ fun Application.authRoutes() {
     val authController by inject<AuthController>()
     routing {
         route("/auth") {
-            post("/login") {
-                authController.login(call)
+            post("/verify-otp") {
+                authController.verifyOtp(call)
             }
-            post("/signup") {
-                authController.signup(call)
+            post("/complete-signup") {
+                authController.completeSignup(call)
             }
-            post("/forgot") {
-                authController.forgot(call)
+            post("/check-user-id") {
+                authController.checkUserId(call)
             }
             post("/refresh") {
                 authController.refresh(call)

@@ -22,7 +22,8 @@ class SearchRepositoryImpl(
             .where {
                 (UserTable.name like searchPattern) or
                 (UserTable.username like searchPattern) or
-                (UserTable.email like searchPattern)
+                (UserTable.email like searchPattern) or
+                (UserTable.phone like searchPattern)
             }
             .limit(limit)
             .map { row ->
@@ -30,6 +31,7 @@ class SearchRepositoryImpl(
                     userId = row[UserTable.userId].toString(),
                     name = row[UserTable.name],
                     email = row[UserTable.email],
+                    phone = row[UserTable.phone],
                     username = row[UserTable.username],
                     profilePictureUrl = row[UserTable.profilePictureUrl],
                     bio = row[UserTable.bio]

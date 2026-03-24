@@ -11,7 +11,7 @@ import com.ranjan.domain.common.model.PaginationResult
 import com.ranjan.domain.story.model.MediaType
 import com.ranjan.domain.story.model.StoryResponse
 import com.ranjan.domain.story.repository.StoryRepository
-import io.ktor.server.plugins.NotFoundException
+import com.ranjan.domain.exception.ResourceNotFoundException
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import java.util.UUID
@@ -138,7 +138,7 @@ class StoryRepositoryImpl(
     override suspend fun deleteStory(storyId: String, userId: UUID) {
         db.dbQuery {
             val story = StoryTable.selectAll().where { StoryTable.storyId eq storyId }.singleOrNull()
-                ?: throw NotFoundException("Story not found")
+                ?: throw ResourceNotFoundException("Story not found")
 
             if (story[StoryTable.authorId] != userId) {
                 throw IllegalStateException("You can only delete your own stories")

@@ -2,6 +2,8 @@ package com.ranjan.server.post
 
 import com.ranjan.domain.common.model.PaginationRequest
 import com.ranjan.domain.auth.model.ErrorResponse
+import com.ranjan.domain.exception.ForbiddenException
+import com.ranjan.domain.exception.ResourceNotFoundException
 import com.ranjan.domain.exception.UnauthorizedException
 import com.ranjan.domain.post.model.*
 import com.ranjan.domain.post.usecase.*
@@ -9,7 +11,6 @@ import com.ranjan.server.common.extension.userId
 import com.ranjan.server.common.extension.userIdOrNull
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
-import io.ktor.server.plugins.NotFoundException
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import java.util.UUID
@@ -109,9 +110,7 @@ class PostController(
             call.respond(HttpStatusCode.OK, it)
         }.onFailure { ex ->
             when (ex) {
-                is NotFoundException ->
-                    call.respond(HttpStatusCode.NotFound, ErrorResponse("Post not found"))
-
+                is ResourceNotFoundException -> throw ex
                 else ->
                     call.respond(
                         HttpStatusCode.InternalServerError,
@@ -187,12 +186,7 @@ class PostController(
             call.respond(HttpStatusCode.OK, it)
         }.onFailure { ex ->
             when (ex) {
-                is AccessDeniedException ->
-                    call.respond(HttpStatusCode.Forbidden, ErrorResponse("Not allowed"))
-
-                is NotFoundException ->
-                    call.respond(HttpStatusCode.NotFound, ErrorResponse("Post not found"))
-
+                is ForbiddenException, is ResourceNotFoundException -> throw ex
                 else ->
                     call.respond(
                         HttpStatusCode.InternalServerError,
@@ -225,12 +219,7 @@ class PostController(
             call.respond(HttpStatusCode.OK, { "Post deleted" })
         }.onFailure { ex ->
             when (ex) {
-                is AccessDeniedException ->
-                    call.respond(HttpStatusCode.Forbidden, ErrorResponse("Not allowed"))
-
-                is NotFoundException ->
-                    call.respond(HttpStatusCode.NotFound, ErrorResponse("Post not found"))
-
+                is ForbiddenException, is ResourceNotFoundException -> throw ex
                 else ->
                     call.respond(
                         HttpStatusCode.InternalServerError,
@@ -262,11 +251,15 @@ class PostController(
 
         result.onSuccess {
             call.respond(HttpStatusCode.OK, it)
-        }.onFailure {
-            call.respond(
-                HttpStatusCode.InternalServerError,
-                ErrorResponse("Failed to update like status")
-            )
+        }.onFailure { ex ->
+            when (ex) {
+                is ResourceNotFoundException -> throw ex
+                else ->
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        ErrorResponse("Failed to update like status")
+                    )
+            }
         }
     }
 
@@ -292,11 +285,15 @@ class PostController(
 
         result.onSuccess {
             call.respond(HttpStatusCode.OK, it)
-        }.onFailure {
-            call.respond(
-                HttpStatusCode.InternalServerError,
-                ErrorResponse("Failed to update bookmark status")
-            )
+        }.onFailure { ex ->
+            when (ex) {
+                is ResourceNotFoundException -> throw ex
+                else ->
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        ErrorResponse("Failed to update bookmark status")
+                    )
+            }
         }
     }
 }

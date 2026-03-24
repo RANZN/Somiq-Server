@@ -2,7 +2,7 @@ package com.ranjan.domain.post.usecase
 
 import com.ranjan.domain.post.model.ToggleResponse
 import com.ranjan.domain.post.repository.PostRepository
-import io.ktor.server.plugins.NotFoundException
+import com.ranjan.domain.exception.ResourceNotFoundException
 import java.util.UUID
 
 class ToggleLikeUseCase(
@@ -14,7 +14,7 @@ class ToggleLikeUseCase(
     ): Result<ToggleResponse> = runCatching {
 
         if (!postRepository.exists(postId)) {
-            throw NotFoundException("Post not found")
+            throw ResourceNotFoundException("Post not found")
         }
 
         postRepository.toggleLike(userId, postId)

@@ -19,19 +19,22 @@ class RefreshTokenRepoImpl(
     private val db: Database
 ) : RefreshTokenRepo {
 
-    override suspend fun save(userId: String, refreshToken: String): RefreshTokenEntity? = db.dbQuery {
+    override suspend fun save(userId: String, refreshToken: String, deviceId: String): RefreshTokenEntity? = db.dbQuery {
         val expiry = Clock.System.now().plus(JwtConfig.Lifetime.refresh)
         val insertStatement = RefreshTokenTable.insert {
             it[this.userId] = userId
             it[this.token] = refreshToken
+            it[this.deviceId] = deviceId
             it[this.expiresAt] = expiry
         }
         insertStatement.resultedValues?.singleOrNull()?.let(::toRefreshTokenEntity)
     }
 
-    override suspend fun findByToken(userId: String, token: String): Boolean = db.dbQuery {
+    override suspend fun findByToken(userId: String, token: String, deviceId: String): Boolean = db.dbQuery {
         RefreshTokenTable.selectAll().where {
-            (RefreshTokenTable.userId eq userId) and (RefreshTokenTable.token eq token)
+            (RefreshTokenTable.userId eq userId) and
+                (RefreshTokenTable.token eq token) and
+                (RefreshTokenTable.deviceId eq deviceId)
         }.empty().not()
     }
 
@@ -52,6 +55,7 @@ class RefreshTokenRepoImpl(
             id = row[RefreshTokenTable.id].toString(),
             userId = row[RefreshTokenTable.userId],
             token = row[RefreshTokenTable.token],
+            deviceId = row[RefreshTokenTable.deviceId],
             expiresAt = row[RefreshTokenTable.expiresAt],
             createdAt = row[RefreshTokenTable.createdAt]
         )

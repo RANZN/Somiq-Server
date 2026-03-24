@@ -24,6 +24,7 @@ class AccountRepositoryImpl(
             userId = user[UserTable.userId].toString(),
             name = user[UserTable.name],
             email = user[UserTable.email],
+            phone = user[UserTable.phone],
             username = user[UserTable.username],
             profilePictureUrl = user[UserTable.profilePictureUrl],
             bio = user[UserTable.bio]

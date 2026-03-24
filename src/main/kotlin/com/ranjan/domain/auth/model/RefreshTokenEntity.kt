@@ -6,6 +6,7 @@ data class RefreshTokenEntity(
     val id: String,
     val userId: String,
     val token: String,
+    val deviceId: String?,
     val expiresAt: Instant,
     val createdAt: Instant
 )

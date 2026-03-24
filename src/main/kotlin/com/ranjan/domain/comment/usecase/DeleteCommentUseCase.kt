@@ -1,8 +1,8 @@
 package com.ranjan.domain.comment.usecase
 
 import com.ranjan.domain.comment.repository.CommentRepository
-import com.ranjan.domain.common.exceptions.ForbiddenException
-import io.ktor.server.plugins.NotFoundException
+import com.ranjan.domain.exception.ForbiddenException
+import com.ranjan.domain.exception.ResourceNotFoundException
 import java.util.UUID
 
 class DeleteCommentUseCase(
@@ -13,7 +13,7 @@ class DeleteCommentUseCase(
         commentId: String
     ): Result<Unit> = runCatching {
         val existing = commentRepository.getCommentById(commentId, userId)
-            ?: throw NotFoundException("Comment not found")
+            ?: throw ResourceNotFoundException("Comment not found")
 
         if (existing.authorId != userId) {
             throw ForbiddenException("You can only delete your own comments")

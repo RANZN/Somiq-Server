@@ -4,13 +4,13 @@ import com.ranjan.domain.auth.model.ErrorResponse
 import com.ranjan.domain.comment.model.CreateCommentRequest
 import com.ranjan.domain.comment.model.UpdateCommentRequest
 import com.ranjan.domain.comment.usecase.*
-import com.ranjan.domain.common.exceptions.ForbiddenException
+import com.ranjan.domain.exception.ForbiddenException
+import com.ranjan.domain.exception.ResourceNotFoundException
 import com.ranjan.domain.common.model.PaginationRequest
 import com.ranjan.server.common.extension.userId
 import com.ranjan.server.common.extension.userIdOrNull
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
-import io.ktor.server.plugins.NotFoundException
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 
@@ -119,10 +119,7 @@ class CommentController(
             call.respond(HttpStatusCode.OK, it)
         }.onFailure { ex ->
             when (ex) {
-                is ForbiddenException ->
-                    call.respond(HttpStatusCode.Forbidden, ErrorResponse("Not allowed"))
-                is NotFoundException ->
-                    call.respond(HttpStatusCode.NotFound, ErrorResponse("Comment not found"))
+                is ForbiddenException, is ResourceNotFoundException -> throw ex
                 else ->
                     call.respond(
                         HttpStatusCode.BadRequest,
@@ -152,10 +149,7 @@ class CommentController(
             call.respond(HttpStatusCode.OK, mapOf("message" to "Comment deleted"))
         }.onFailure { ex ->
             when (ex) {
-                is ForbiddenException ->
-                    call.respond(HttpStatusCode.Forbidden, ErrorResponse("Not allowed"))
-                is NotFoundException ->
-                    call.respond(HttpStatusCode.NotFound, ErrorResponse("Comment not found"))
+                is ForbiddenException, is ResourceNotFoundException -> throw ex
                 else ->
                     call.respond(
                         HttpStatusCode.BadRequest,

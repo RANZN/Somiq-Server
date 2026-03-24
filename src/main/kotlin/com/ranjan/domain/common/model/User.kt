@@ -9,16 +9,17 @@ data class User(
     @Serializable(with = UUIDSerializer::class)
     val userId: UUID,
     val name: String,
-    val email: String,
+    val email: String? = null,
+    val phone: String? = null,
     val username: String? = null,
     val profilePictureUrl: String? = null,
     val bio: String? = null,
-    val hashedPassword: String,
 ) {
     fun asResponse() = UserResponse(
         userId = userId.toString(),
         name = name,
         email = email,
+        phone = phone,
         username = username,
         profilePictureUrl = profilePictureUrl,
         bio = bio
@@ -29,7 +30,8 @@ data class User(
 data class UserResponse(
     val userId: String,
     val name: String,
-    val email: String,
+    val email: String? = null,
+    val phone: String? = null,
     val username: String? = null,
     val profilePictureUrl: String? = null,
     val bio: String? = null,

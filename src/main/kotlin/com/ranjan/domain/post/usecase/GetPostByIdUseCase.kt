@@ -2,7 +2,7 @@ package com.ranjan.domain.post.usecase
 
 import com.ranjan.domain.post.model.PostResponse
 import com.ranjan.domain.post.repository.PostRepository
-import io.ktor.server.plugins.NotFoundException
+import com.ranjan.domain.exception.ResourceNotFoundException
 
 class GetPostByIdUseCase(
     private val postRepository: PostRepository
@@ -10,7 +10,7 @@ class GetPostByIdUseCase(
     suspend fun execute(postId: String): Result<PostResponse> =
         runCatching {
             val post = postRepository.getPostById(postId)
-                ?: throw NotFoundException("Post not found")
+                ?: throw ResourceNotFoundException("Post not found")
 
             post
         }

@@ -9,7 +9,7 @@ import com.ranjan.server.common.extension.getUserIdAndViewerId
 import com.ranjan.server.common.extension.userId
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
-import io.ktor.server.plugins.NotFoundException
+import com.ranjan.domain.exception.ResourceNotFoundException
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import java.util.UUID
@@ -29,8 +29,7 @@ class AccountController(
             call.respond(HttpStatusCode.OK, it)
         }.onFailure { ex ->
             when (ex) {
-                is NotFoundException ->
-                    call.respond(HttpStatusCode.NotFound, ErrorResponse("User not found"))
+                is ResourceNotFoundException -> throw ex
                 else ->
                     call.respond(
                         HttpStatusCode.InternalServerError,

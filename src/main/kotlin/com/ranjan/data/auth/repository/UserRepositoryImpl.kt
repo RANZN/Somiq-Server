@@ -20,6 +20,12 @@ class UserRepositoryImpl(
             .singleOrNull()
     }
 
+    override suspend fun findByPhone(phone: String): User? = db.dbQuery {
+        UserTable.selectAll().where { UserTable.phone eq phone }
+            .map { toUser(it) }
+            .singleOrNull()
+    }
+
     override suspend fun findById(userId: UUID): User? = db.dbQuery {
         UserTable.selectAll().where { UserTable.userId eq userId }
             .map { toUser(it) }
@@ -30,6 +36,10 @@ class UserRepositoryImpl(
         !UserTable.selectAll().where { UserTable.email eq email }.empty()
     }
 
+    override suspend fun isPhoneExists(phone: String): Boolean = db.dbQuery {
+        !UserTable.selectAll().where { UserTable.phone eq phone }.empty()
+    }
+
     override suspend fun isUsernameExists(username: String): Boolean = db.dbQuery {
         !UserTable.selectAll().where { UserTable.username eq username }.empty()
     }
@@ -38,11 +48,11 @@ class UserRepositoryImpl(
         val insertStatement = UserTable.insert {
             it[userId] = user.userId
             it[email] = user.email
+            it[phone] = user.phone
             it[name] = user.name
             it[username] = user.username
             it[profilePictureUrl] = user.profilePictureUrl
             it[bio] = user.bio
-            it[password] = user.hashedPassword
         }
         insertStatement.resultedValues?.singleOrNull()?.let(::toUser)
     }
@@ -61,9 +71,9 @@ class UserRepositoryImpl(
         userId = row[UserTable.userId],
         name = row[UserTable.name],
         email = row[UserTable.email],
+        phone = row[UserTable.phone],
         username = row[UserTable.username],
         profilePictureUrl = row[UserTable.profilePictureUrl],
         bio = row[UserTable.bio],
-        hashedPassword = row[UserTable.password]
     )
 }
