@@ -1,8 +1,8 @@
 package com.ranjan.server.common.extension
 
 import com.ranjan.data.auth.service.JwtConfig
-import com.ranjan.domain.exception.InvalidUserIdException
-import com.ranjan.domain.exception.UnauthorizedException
+import com.ranjan.core.exception.InvalidUserIdException
+import com.ranjan.core.exception.UnauthorizedException
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*

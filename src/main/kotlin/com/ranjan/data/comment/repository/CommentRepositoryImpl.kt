@@ -12,7 +12,7 @@ import com.ranjan.domain.comment.model.UpdateCommentRequest
 import com.ranjan.domain.comment.repository.CommentRepository
 import com.ranjan.domain.common.model.PaginationRequest
 import com.ranjan.domain.common.model.PaginationResult
-import com.ranjan.domain.exception.ResourceNotFoundException
+import com.ranjan.core.exception.ResourceNotFoundException
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import java.util.*

@@ -1,10 +1,10 @@
 package com.ranjan.domain.reel.usecase
 
-import com.ranjan.domain.exception.ForbiddenException
+import com.ranjan.core.exception.ForbiddenException
 import com.ranjan.domain.reel.model.ReelResponse
 import com.ranjan.domain.reel.model.UpdateReelRequest
 import com.ranjan.domain.reel.repository.ReelRepository
-import com.ranjan.domain.exception.ResourceNotFoundException
+import com.ranjan.core.exception.ResourceNotFoundException
 import java.util.UUID
 
 class UpdateReelUseCase(

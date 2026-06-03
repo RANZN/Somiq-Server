@@ -1,11 +1,11 @@
 package com.ranjan.server.comment
 
-import com.ranjan.domain.auth.model.ErrorResponse
+import com.ranjan.core.exception.ForbiddenException
+import com.ranjan.core.exception.ResourceNotFoundException
+import com.ranjan.core.model.ErrorResponse
 import com.ranjan.domain.comment.model.CreateCommentRequest
 import com.ranjan.domain.comment.model.UpdateCommentRequest
 import com.ranjan.domain.comment.usecase.*
-import com.ranjan.domain.exception.ForbiddenException
-import com.ranjan.domain.exception.ResourceNotFoundException
 import com.ranjan.domain.common.model.PaginationRequest
 import com.ranjan.server.common.extension.userId
 import com.ranjan.server.common.extension.userIdOrNull
@@ -185,4 +185,3 @@ class CommentController(
         }
     }
 }
-

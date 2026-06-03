@@ -2,6 +2,7 @@ package com.ranjan.server.auth
 
 import com.ranjan.domain.auth.model.*
 import com.ranjan.domain.auth.usecase.*
+import com.ranjan.core.model.ErrorResponse
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*

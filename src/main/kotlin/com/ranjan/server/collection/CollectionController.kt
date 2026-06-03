@@ -1,6 +1,6 @@
 package com.ranjan.server.collection
 
-import com.ranjan.domain.auth.model.ErrorResponse
+import com.ranjan.core.model.ErrorResponse
 import com.ranjan.domain.collection.model.AddItemRequest
 import com.ranjan.domain.collection.model.CreateCollectionRequest
 import com.ranjan.domain.collection.model.UpdateCollectionRequest
@@ -222,4 +222,3 @@ class CollectionController(
         }
     }
 }
-

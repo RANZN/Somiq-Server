@@ -1,8 +1,8 @@
 package com.ranjan.server.reel
 
-import com.ranjan.domain.auth.model.ErrorResponse
-import com.ranjan.domain.exception.ForbiddenException
-import com.ranjan.domain.exception.ResourceNotFoundException
+import com.ranjan.core.model.ErrorResponse
+import com.ranjan.core.exception.ForbiddenException
+import com.ranjan.core.exception.ResourceNotFoundException
 import com.ranjan.domain.common.model.PaginationRequest
 import com.ranjan.domain.reel.model.*
 import com.ranjan.domain.reel.usecase.*
@@ -225,4 +225,3 @@ class ReelController(
         }
     }
 }
-

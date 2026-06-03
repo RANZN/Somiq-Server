@@ -1,6 +1,6 @@
 package com.ranjan.domain.post.model
 
-import com.ranjan.util.UUIDSerializer
+import com.ranjan.core.util.UUIDSerializer
 import kotlinx.serialization.Serializable
 import java.util.UUID
 

@@ -2,7 +2,7 @@ package com.ranjan.domain.reel.usecase
 
 import com.ranjan.domain.reel.model.ReelResponse
 import com.ranjan.domain.reel.repository.ReelRepository
-import com.ranjan.domain.exception.ResourceNotFoundException
+import com.ranjan.core.exception.ResourceNotFoundException
 
 class GetReelByIdUseCase(
     private val reelRepository: ReelRepository

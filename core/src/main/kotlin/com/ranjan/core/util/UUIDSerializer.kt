@@ -1,4 +1,4 @@
-package com.ranjan.util
+package com.ranjan.core.util
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind

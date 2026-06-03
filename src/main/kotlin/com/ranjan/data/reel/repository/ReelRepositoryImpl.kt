@@ -15,7 +15,7 @@ import com.ranjan.domain.reel.model.CreateReelRequest
 import com.ranjan.domain.reel.model.ReelResponse
 import com.ranjan.domain.reel.model.UpdateReelRequest
 import com.ranjan.domain.reel.repository.ReelRepository
-import com.ranjan.domain.exception.ResourceNotFoundException
+import com.ranjan.core.exception.ResourceNotFoundException
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import java.util.*

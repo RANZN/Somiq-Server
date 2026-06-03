@@ -1,6 +1,6 @@
 package com.ranjan.domain.story.model
 
-import com.ranjan.util.UUIDSerializer
+import com.ranjan.core.util.UUIDSerializer
 import kotlinx.serialization.Serializable
 import java.util.UUID
 
@@ -25,4 +25,3 @@ enum class MediaType {
     IMAGE,
     VIDEO
 }
-
