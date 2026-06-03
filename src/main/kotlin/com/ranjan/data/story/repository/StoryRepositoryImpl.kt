@@ -11,7 +11,7 @@ import com.ranjan.domain.common.model.PaginationResult
 import com.ranjan.domain.story.model.MediaType
 import com.ranjan.domain.story.model.StoryResponse
 import com.ranjan.domain.story.repository.StoryRepository
-import com.ranjan.domain.exception.ResourceNotFoundException
+import com.ranjan.core.exception.ResourceNotFoundException
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import java.util.UUID

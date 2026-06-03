@@ -1,19 +1,20 @@
 package com.ranjan.server.post
 
+import com.ranjan.core.exception.ForbiddenException
+import com.ranjan.core.exception.ResourceNotFoundException
+import com.ranjan.core.exception.UnauthorizedException
+import com.ranjan.core.model.ErrorResponse
 import com.ranjan.domain.common.model.PaginationRequest
-import com.ranjan.domain.auth.model.ErrorResponse
-import com.ranjan.domain.exception.ForbiddenException
-import com.ranjan.domain.exception.ResourceNotFoundException
-import com.ranjan.domain.exception.UnauthorizedException
-import com.ranjan.domain.post.model.*
+import com.ranjan.domain.post.model.CreatePostRequest
+import com.ranjan.domain.post.model.UpdatePostRequest
 import com.ranjan.domain.post.usecase.*
 import com.ranjan.server.common.extension.userId
 import com.ranjan.server.common.extension.userIdOrNull
-import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.ApplicationCall
-import io.ktor.server.request.receive
-import io.ktor.server.response.respond
-import java.util.UUID
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import java.util.*
 
 class PostController(
     private val createPostUseCase: CreatePostUseCase,

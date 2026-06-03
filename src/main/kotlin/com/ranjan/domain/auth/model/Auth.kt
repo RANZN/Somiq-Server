@@ -60,11 +60,6 @@ data class RefreshTokenResponse(
     val refreshToken: String
 )
 
-@Serializable
-data class ErrorResponse(
-    val message: String
-)
-
 /** Optional dev bypass code; see `otp.devBypassCode` in server config. */
 object OtpConfig {
     const val DEV_OTP = "000000"

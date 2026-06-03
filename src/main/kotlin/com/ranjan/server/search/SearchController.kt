@@ -1,6 +1,6 @@
 package com.ranjan.server.search
 
-import com.ranjan.domain.auth.model.ErrorResponse
+import com.ranjan.core.model.ErrorResponse
 import com.ranjan.domain.search.usecase.SearchUseCase
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
@@ -35,4 +35,3 @@ class SearchController(
         }
     }
 }
-

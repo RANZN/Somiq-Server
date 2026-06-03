@@ -1,6 +1,6 @@
 package com.ranjan.domain.reel.model
 
-import com.ranjan.util.UUIDSerializer
+import com.ranjan.core.util.UUIDSerializer
 import kotlinx.serialization.Serializable
 import java.util.UUID
 
@@ -24,4 +24,3 @@ data class ReelResponse(
     val isLiked: Boolean = false,
     val isBookmarked: Boolean = false
 )
-

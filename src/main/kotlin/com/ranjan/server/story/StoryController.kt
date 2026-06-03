@@ -1,6 +1,6 @@
 package com.ranjan.server.story
 
-import com.ranjan.domain.auth.model.ErrorResponse
+import com.ranjan.core.model.ErrorResponse
 import com.ranjan.domain.common.model.PaginationRequest
 import com.ranjan.domain.story.model.CreateStoryRequest
 import com.ranjan.domain.story.usecase.*
@@ -156,4 +156,3 @@ class StoryController(
         }
     }
 }
-

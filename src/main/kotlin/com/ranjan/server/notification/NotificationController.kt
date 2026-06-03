@@ -1,6 +1,6 @@
 package com.ranjan.server.notification
 
-import com.ranjan.domain.auth.model.ErrorResponse
+import com.ranjan.core.model.ErrorResponse
 import com.ranjan.domain.common.model.PaginationRequest
 import com.ranjan.domain.notification.usecase.*
 import com.ranjan.server.common.extension.userId
@@ -113,4 +113,3 @@ class NotificationController(
         }
     }
 }
-

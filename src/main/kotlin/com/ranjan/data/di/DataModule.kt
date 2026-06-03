@@ -11,7 +11,6 @@ import com.ranjan.data.post.repository.PostRepositoryImpl
 import com.ranjan.data.reel.repository.ReelRepositoryImpl
 import com.ranjan.data.search.repository.SearchRepositoryImpl
 import com.ranjan.data.story.repository.StoryRepositoryImpl
-import com.ranjan.data.sources.db.DataSourceProvider
 import com.ranjan.data.util.SystemTimeProvider
 import com.ranjan.data.util.TimeProvider
 import com.ranjan.domain.account.repository.AccountRepository
@@ -25,13 +24,11 @@ import com.ranjan.domain.post.repository.PostRepository
 import com.ranjan.domain.reel.repository.ReelRepository
 import com.ranjan.domain.search.repository.SearchRepository
 import com.ranjan.domain.story.repository.StoryRepository
-import org.jetbrains.exposed.sql.Database
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 val dataModule = module {
-    single<Database> { DataSourceProvider.initDatabase() }
     singleOf(::UserRepositoryImpl) { bind<UserRepository>() }
     singleOf(::RefreshTokenRepoImpl) { bind<RefreshTokenRepo>() }
     singleOf(::JwtTokenProvider) { bind<TokenProvider>() }

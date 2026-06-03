@@ -1,28 +1,18 @@
 package com.ranjan
 
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
-import com.ranjan.data.auth.service.JwtConfig
+import com.ranjan.core.config.configureCORS
+import com.ranjan.core.config.configureExceptionHandling
+import com.ranjan.core.config.configureSecurity
+import com.ranjan.core.config.configureSerialization
+import com.ranjan.core.di.databaseModule
 import com.ranjan.data.di.dataModule
-import com.ranjan.domain.auth.model.ErrorResponse
+import com.ranjan.data.sources.db.SchemaInitializer
 import com.ranjan.domain.di.domainModule
-import com.ranjan.domain.exception.ForbiddenException
-import com.ranjan.domain.exception.InvalidUserIdException
-import com.ranjan.domain.exception.ResourceNotFoundException
-import com.ranjan.domain.exception.UnauthorizedException
-import com.ranjan.domain.exception.ValidationException
 import com.ranjan.server.configureRoutes
 import com.ranjan.server.di.appModule
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
-import io.ktor.server.auth.*
-import io.ktor.server.auth.jwt.*
-import io.ktor.server.plugins.contentnegotiation.*
-import io.ktor.server.plugins.cors.routing.*
-import io.ktor.server.plugins.statuspages.*
-import io.ktor.server.response.*
-import kotlinx.serialization.json.Json
+import org.jetbrains.exposed.sql.Database
+import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.Koin
 
 fun main(args: Array<String>) {
@@ -32,6 +22,7 @@ fun main(args: Array<String>) {
 @Suppress("unused")
 fun Application.module() {
     configureKoin()
+    configureDatabase()
     configureSerialization()
     configureSecurity()
     configureRoutes()
@@ -42,96 +33,11 @@ fun Application.module() {
 fun Application.configureKoin() {
     install(Koin) {
         printLogger()
-        modules(dataModule, domainModule, appModule)
+        modules(databaseModule, dataModule, domainModule, appModule)
     }
 }
 
-fun Application.configureSerialization() {
-    install(ContentNegotiation) {
-        json(Json {
-            prettyPrint = true
-            isLenient = true
-            ignoreUnknownKeys = true
-        })
-    }
-}
-
-fun Application.configureSecurity() {
-    install(Authentication) {
-        jwt(JwtConfig.NAME) {
-            verifier(
-                JWT
-                    .require(Algorithm.HMAC256(JwtConfig.SECRET))
-                    .withAudience(JwtConfig.AUDIENCE)
-                    .withIssuer(JwtConfig.ISSUER)
-                    .build()
-            )
-            validate { credential ->
-                val userId = credential.payload.getClaim(JwtConfig.Claims.USER_ID).asString()
-                if (userId != null) JWTPrincipal(credential.payload)
-                else null
-            }
-        }
-    }
-}
-
-fun Application.configureExceptionHandling() {
-    install(StatusPages) {
-        exception<InvalidUserIdException> { call, _ ->
-            call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid user ID"))
-        }
-
-        exception<UnauthorizedException> { call, _ ->
-            call.respond(HttpStatusCode.Unauthorized, ErrorResponse("Login required"))
-        }
-
-        exception<ResourceNotFoundException> { call, cause ->
-            call.respond(
-                HttpStatusCode.NotFound,
-                ErrorResponse(cause.message ?: "Not found")
-            )
-        }
-
-        exception<ForbiddenException> { call, cause ->
-            call.respond(
-                HttpStatusCode.Forbidden,
-                ErrorResponse(cause.message ?: "Forbidden")
-            )
-        }
-
-        exception<ValidationException> { call, cause ->
-            call.respond(
-                HttpStatusCode.BadRequest,
-                ErrorResponse(cause.message ?: "Invalid request")
-            )
-        }
-
-        exception<Throwable> { call, cause ->
-            call.respondText(
-                text = "500: ${cause.message}",
-                status = HttpStatusCode.InternalServerError
-            )
-        }
-
-        status(HttpStatusCode.NotFound) { call, status ->
-            call.respondText(text = "404: Page Not Found", status = status)
-        }
-
-        status(HttpStatusCode.Unauthorized) { call, status ->
-            call.respondText(text = "401: Unauthorized", status = status)
-        }
-    }
-}
-
-fun Application.configureCORS() {
-    install(CORS) {
-        allowMethod(HttpMethod.Options)
-        allowMethod(HttpMethod.Put)
-        allowMethod(HttpMethod.Delete)
-        allowMethod(HttpMethod.Patch)
-        allowMethod(HttpMethod.Post)
-        allowHeader(HttpHeaders.Authorization)
-        allowHeader(HttpHeaders.ContentType)
-        anyHost() //todo: In production, we should restrict this
-    }
+fun Application.configureDatabase() {
+    val database: Database by inject()
+    SchemaInitializer.init(database)
 }

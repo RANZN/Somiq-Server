@@ -1,8 +1,8 @@
 package com.ranjan.domain.post.usecase
 
-import com.ranjan.domain.exception.ForbiddenException
+import com.ranjan.core.exception.ForbiddenException
 import com.ranjan.domain.post.repository.PostRepository
-import com.ranjan.domain.exception.ResourceNotFoundException
+import com.ranjan.core.exception.ResourceNotFoundException
 import java.util.UUID
 
 class DeletePostUseCase(

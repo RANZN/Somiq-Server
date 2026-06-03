@@ -1,6 +1,6 @@
 package com.ranjan.server.media
 
-import com.ranjan.domain.auth.model.ErrorResponse
+import com.ranjan.core.model.ErrorResponse
 import com.ranjan.server.common.extension.userId
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart

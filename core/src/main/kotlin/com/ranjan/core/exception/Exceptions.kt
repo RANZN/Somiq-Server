@@ -1,4 +1,4 @@
-package com.ranjan.domain.exception
+package com.ranjan.core.exception
 
 /** Invalid user id in route or query (HTTP 400). */
 class InvalidUserIdException : RuntimeException()

@@ -1,6 +1,6 @@
 package com.ranjan.domain.notification.model
 
-import com.ranjan.util.UUIDSerializer
+import com.ranjan.core.util.UUIDSerializer
 import kotlinx.serialization.Serializable
 import java.util.UUID
 
@@ -31,4 +31,3 @@ enum class NotificationType {
     FOLLOW,
     MENTION
 }
-

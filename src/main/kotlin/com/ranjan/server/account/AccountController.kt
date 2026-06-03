@@ -1,15 +1,15 @@
 package com.ranjan.server.account
 
+import com.ranjan.core.exception.ResourceNotFoundException
 import com.ranjan.domain.account.model.UpdateProfileRequest
 import com.ranjan.domain.account.usecase.GetProfileUseCase
 import com.ranjan.domain.account.usecase.ToggleFollowUseCase
 import com.ranjan.domain.account.usecase.UpdateProfileUseCase
-import com.ranjan.domain.auth.model.ErrorResponse
+import com.ranjan.core.model.ErrorResponse
 import com.ranjan.server.common.extension.getUserIdAndViewerId
 import com.ranjan.server.common.extension.userId
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
-import com.ranjan.domain.exception.ResourceNotFoundException
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import java.util.UUID
@@ -105,4 +105,3 @@ class AccountController(
         }
     }
 }
-
