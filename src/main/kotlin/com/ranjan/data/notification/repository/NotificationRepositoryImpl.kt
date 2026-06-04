@@ -1,8 +1,8 @@
 package com.ranjan.data.notification.repository
 
+import com.ranjan.core.db.dbQuery
 import com.ranjan.data.auth.model.UserTable
 import com.ranjan.data.notification.model.NotificationTable
-import com.ranjan.data.sources.db.dbQuery
 import org.jetbrains.exposed.sql.Database
 import com.ranjan.domain.common.model.PaginationRequest
 import com.ranjan.domain.common.model.PaginationResult
@@ -140,4 +140,3 @@ class NotificationRepositoryImpl(
         )
     }
 }
-

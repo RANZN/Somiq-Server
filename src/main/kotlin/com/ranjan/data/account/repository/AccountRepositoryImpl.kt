@@ -1,10 +1,10 @@
 package com.ranjan.data.account.repository
 
+import com.ranjan.core.db.dbQuery
 import com.ranjan.data.account.model.FollowTable
 import com.ranjan.data.auth.model.UserTable
 import com.ranjan.data.post.model.PostTable
 import com.ranjan.data.reel.model.ReelTable
-import com.ranjan.data.sources.db.dbQuery
 import com.ranjan.domain.account.model.ProfileResponse
 import com.ranjan.domain.account.repository.AccountRepository
 import com.ranjan.domain.common.model.UserResponse
@@ -85,4 +85,3 @@ class AccountRepositoryImpl(
             .any()
     }
 }
-
