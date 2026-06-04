@@ -1,10 +1,10 @@
 package com.ranjan.data.collection.repository
 
+import com.ranjan.core.db.dbQuery
 import com.ranjan.core.exception.ResourceNotFoundException
+import com.ranjan.core.util.TimeProvider
 import com.ranjan.data.collection.model.CollectionItemTable
 import com.ranjan.data.collection.model.CollectionTable
-import com.ranjan.data.sources.db.dbQuery
-import com.ranjan.data.util.TimeProvider
 import com.ranjan.domain.collection.model.CollectionItemResponse
 import com.ranjan.domain.collection.model.CollectionResponse
 import com.ranjan.domain.collection.model.ItemType
@@ -182,4 +182,3 @@ class CollectionRepositoryImpl(
         CollectionItemTable.selectAll().where { CollectionItemTable.collectionId eq collectionId }.count()
     }
 }
-

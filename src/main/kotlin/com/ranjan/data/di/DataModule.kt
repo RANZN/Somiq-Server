@@ -11,8 +11,6 @@ import com.ranjan.data.post.repository.PostRepositoryImpl
 import com.ranjan.data.reel.repository.ReelRepositoryImpl
 import com.ranjan.data.search.repository.SearchRepositoryImpl
 import com.ranjan.data.story.repository.StoryRepositoryImpl
-import com.ranjan.data.util.SystemTimeProvider
-import com.ranjan.data.util.TimeProvider
 import com.ranjan.domain.account.repository.AccountRepository
 import com.ranjan.domain.auth.repository.RefreshTokenRepo
 import com.ranjan.domain.auth.repository.UserRepository
@@ -40,5 +38,4 @@ val dataModule = module {
     singleOf(::CollectionRepositoryImpl) { bind<CollectionRepository>() }
     singleOf(::SearchRepositoryImpl) { bind<SearchRepository>() }
     singleOf(::AccountRepositoryImpl) { bind<AccountRepository>() }
-    singleOf(::SystemTimeProvider) { bind<TimeProvider>() }
 }

@@ -4,6 +4,7 @@ import com.ranjan.core.config.configureCORS
 import com.ranjan.core.config.configureExceptionHandling
 import com.ranjan.core.config.configureSecurity
 import com.ranjan.core.config.configureSerialization
+import com.ranjan.core.di.coreModule
 import com.ranjan.core.di.databaseModule
 import com.ranjan.data.di.dataModule
 import com.ranjan.data.sources.db.SchemaInitializer
@@ -11,12 +12,13 @@ import com.ranjan.domain.di.domainModule
 import com.ranjan.server.configureRoutes
 import com.ranjan.server.di.appModule
 import io.ktor.server.application.*
+import io.ktor.server.netty.EngineMain
 import org.jetbrains.exposed.sql.Database
 import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.Koin
 
 fun main(args: Array<String>) {
-    io.ktor.server.netty.EngineMain.main(args)
+    EngineMain.main(args)
 }
 
 @Suppress("unused")
@@ -33,7 +35,7 @@ fun Application.module() {
 fun Application.configureKoin() {
     install(Koin) {
         printLogger()
-        modules(databaseModule, dataModule, domainModule, appModule)
+        modules(coreModule, databaseModule, dataModule, domainModule, appModule)
     }
 }
 

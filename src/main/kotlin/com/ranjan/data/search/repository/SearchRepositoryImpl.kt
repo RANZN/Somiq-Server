@@ -1,10 +1,10 @@
 package com.ranjan.data.search.repository
 
+import com.ranjan.core.db.dbQuery
 import com.ranjan.data.auth.model.UserTable
 import com.ranjan.data.common.extension.toMediaUrls
 import com.ranjan.data.post.model.PostTable
 import com.ranjan.data.reel.model.ReelTable
-import com.ranjan.data.sources.db.dbQuery
 import org.jetbrains.exposed.sql.Database
 import com.ranjan.domain.common.model.UserResponse
 import com.ranjan.domain.post.model.PostResponse
@@ -103,4 +103,3 @@ class SearchRepositoryImpl(
         reels
     }
 }
-

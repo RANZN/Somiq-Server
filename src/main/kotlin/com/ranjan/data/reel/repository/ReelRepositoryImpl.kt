@@ -1,13 +1,14 @@
 package com.ranjan.data.reel.repository
 
+import com.ranjan.core.db.dbQuery
+import com.ranjan.core.exception.ResourceNotFoundException
+import com.ranjan.core.util.TimeProvider
 import com.ranjan.data.auth.model.UserTable
 import com.ranjan.data.comment.model.CommentTable
 import com.ranjan.data.reel.model.ReelBookmarkTable
 import com.ranjan.data.reel.model.ReelLikeTable
 import com.ranjan.data.reel.model.ReelTable
 import com.ranjan.data.reel.model.ReelViewTable
-import com.ranjan.data.sources.db.dbQuery
-import com.ranjan.data.util.TimeProvider
 import org.jetbrains.exposed.sql.Database
 import com.ranjan.domain.common.model.PaginationRequest
 import com.ranjan.domain.common.model.PaginationResult
@@ -15,7 +16,6 @@ import com.ranjan.domain.reel.model.CreateReelRequest
 import com.ranjan.domain.reel.model.ReelResponse
 import com.ranjan.domain.reel.model.UpdateReelRequest
 import com.ranjan.domain.reel.repository.ReelRepository
-import com.ranjan.core.exception.ResourceNotFoundException
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import java.util.*
@@ -250,4 +250,3 @@ class ReelRepositoryImpl(
         )
     }
 }
-

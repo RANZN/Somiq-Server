@@ -1,17 +1,17 @@
 package com.ranjan.data.story.repository
 
+import com.ranjan.core.db.dbQuery
+import com.ranjan.core.exception.ResourceNotFoundException
+import com.ranjan.core.util.TimeProvider
 import com.ranjan.data.auth.model.UserTable
-import com.ranjan.data.sources.db.dbQuery
 import com.ranjan.data.story.model.StoryTable
 import com.ranjan.data.story.model.StoryViewTable
-import com.ranjan.data.util.TimeProvider
 import org.jetbrains.exposed.sql.Database
 import com.ranjan.domain.common.model.PaginationRequest
 import com.ranjan.domain.common.model.PaginationResult
 import com.ranjan.domain.story.model.MediaType
 import com.ranjan.domain.story.model.StoryResponse
 import com.ranjan.domain.story.repository.StoryRepository
-import com.ranjan.core.exception.ResourceNotFoundException
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import java.util.UUID
@@ -207,4 +207,3 @@ class StoryRepositoryImpl(
         )
     }
 }
-

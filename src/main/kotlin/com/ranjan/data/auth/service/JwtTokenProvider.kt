@@ -2,7 +2,7 @@ package com.ranjan.data.auth.service
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.ranjan.data.util.TimeProvider
+import com.ranjan.core.util.TimeProvider
 import com.ranjan.domain.auth.model.AuthToken
 import com.ranjan.domain.auth.services.TokenProvider
 import com.ranjan.domain.common.model.User

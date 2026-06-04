@@ -1,18 +1,17 @@
 package com.ranjan.data.comment.repository
 
+import com.ranjan.core.db.dbQuery
+import com.ranjan.core.exception.ResourceNotFoundException
+import com.ranjan.core.util.TimeProvider
 import com.ranjan.data.auth.model.UserTable
 import com.ranjan.data.comment.model.CommentLikeTable
 import com.ranjan.data.comment.model.CommentTable
-import com.ranjan.data.sources.db.dbQuery
-import com.ranjan.data.util.TimeProvider
-import org.jetbrains.exposed.sql.Database
 import com.ranjan.domain.comment.model.CommentResponse
 import com.ranjan.domain.comment.model.CreateCommentRequest
 import com.ranjan.domain.comment.model.UpdateCommentRequest
 import com.ranjan.domain.comment.repository.CommentRepository
 import com.ranjan.domain.common.model.PaginationRequest
 import com.ranjan.domain.common.model.PaginationResult
-import com.ranjan.core.exception.ResourceNotFoundException
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import java.util.*
@@ -196,4 +195,3 @@ class CommentRepositoryImpl(
         )
     }
 }
-

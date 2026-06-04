@@ -21,7 +21,7 @@ val databaseModule = module {
     }
 }
 
-data class DbConfig(
+private data class DbConfig(
     val driver: String,
     val url: String,
     val user: String,
