@@ -5,14 +5,8 @@ FROM eclipse-temurin:17-jdk-focal AS builder
 
 WORKDIR /app
 
-# Copy Gradle wrapper & settings
-COPY gradlew .
-COPY gradle ./gradle
-COPY build.gradle.kts .
-COPY settings.gradle.kts .
-
-# Copy the source code
-COPY src ./src
+# Copy the entire project source code and configurations
+COPY . .
 
 # Make wrapper executable & build shadow JAR
 RUN chmod +x ./gradlew && ./gradlew shadowJar --no-daemon
