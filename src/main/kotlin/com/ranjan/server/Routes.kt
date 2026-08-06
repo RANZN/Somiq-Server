@@ -1,5 +1,9 @@
 package com.ranjan.server
 
+import com.ranjan.chat.api.chatSocketRoutes
+import com.ranjan.chat.api.conversationRoutes
+import com.ranjan.chat.api.messageRoutes
+import com.ranjan.data.auth.service.JwtConfig
 import com.ranjan.server.account.accountRoutes
 import com.ranjan.server.auth.authRoutes
 import com.ranjan.server.collection.collectionRoutes
@@ -12,6 +16,8 @@ import com.ranjan.server.search.searchRoutes
 import com.ranjan.server.story.storyRoutes
 import com.ranjan.server.update.checkUpdateRoute
 import io.ktor.server.application.Application
+import io.ktor.server.auth.authenticate
+import io.ktor.server.routing.routing
 
 fun Application.configureRoutes() {
     checkUpdateRoute()
@@ -25,4 +31,12 @@ fun Application.configureRoutes() {
     collectionRoutes()
     searchRoutes()
     accountRoutes()
+
+    routing {
+        authenticate(JwtConfig.NAME) {
+            chatSocketRoutes()
+            conversationRoutes()
+            messageRoutes()
+        }
+    }
 }

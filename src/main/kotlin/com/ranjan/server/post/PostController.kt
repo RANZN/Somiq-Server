@@ -7,13 +7,18 @@ import com.ranjan.core.model.ErrorResponse
 import com.ranjan.domain.common.model.PaginationRequest
 import com.ranjan.domain.post.model.CreatePostRequest
 import com.ranjan.domain.post.model.UpdatePostRequest
+import com.ranjan.domain.post.model.withAbsoluteUrls
 import com.ranjan.domain.post.usecase.*
+import com.ranjan.server.common.extension.getExtension
 import com.ranjan.server.common.extension.userId
 import com.ranjan.server.common.extension.userIdOrNull
+import com.ranjan.server.media.MediaStorageService
 import io.ktor.http.*
+import io.ktor.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
+import io.ktor.utils.io.jvm.javaio.*
 import java.util.*
 
 class PostController(
@@ -26,6 +31,7 @@ class PostController(
     private val deletePostUseCase: DeletePostUseCase,
     private val toggleLikeUseCase: ToggleLikeUseCase,
     private val toggleBookmarkUseCase: ToggleBookmarkUseCase,
+    private val mediaStorageService: MediaStorageService,
 ) {
 
     // ---------------------------------------------------------
@@ -63,7 +69,7 @@ class PostController(
         }
 
         result.onSuccess {
-            call.respond(HttpStatusCode.OK, it)
+            call.respond(HttpStatusCode.OK, it.withAbsoluteUrls(call))
         }.onFailure {
             call.respond(
                 HttpStatusCode.InternalServerError,
@@ -88,7 +94,7 @@ class PostController(
             limit = params["limit"]?.toIntOrNull() ?: 20
         )
         getBookmarkedPostsUseCase.execute(userId, pagination)
-            .onSuccess { call.respond(HttpStatusCode.OK, it) }
+            .onSuccess { call.respond(HttpStatusCode.OK, it.withAbsoluteUrls(call)) }
             .onFailure {
                 call.respond(HttpStatusCode.InternalServerError, ErrorResponse("Failed to load bookmarked posts"))
             }
@@ -108,7 +114,7 @@ class PostController(
         val result = getPostByIdUseCase.execute(postId)
 
         result.onSuccess {
-            call.respond(HttpStatusCode.OK, it)
+            call.respond(HttpStatusCode.OK, it.withAbsoluteUrls(call))
         }.onFailure { ex ->
             when (ex) {
                 is ResourceNotFoundException -> throw ex
@@ -132,20 +138,71 @@ class PostController(
             return
         }
 
-        val postRequest = try {
-            call.receive<CreatePostRequest>()
-        } catch (_: Exception) {
-            call.respond(
-                HttpStatusCode.BadRequest,
-                ErrorResponse("Invalid request format")
-            )
-            return
+        val postTimePrefix = System.currentTimeMillis().toString()
+        val subDir = "${userId}/posts/$postTimePrefix"
+
+        val caption: String
+        val savedUrls: List<String>
+
+        if (call.request.contentType().match(ContentType.MultiPart.Any)) {
+            val multipart = call.receiveMultipart()
+            var formCaption = ""
+            val urls = mutableListOf<String>()
+            var errorMessage: String? = null
+
+            try {
+                multipart.forEachPart { part ->
+                    when (part) {
+                        is PartData.FormItem -> {
+                            when (part.name) {
+                                "caption" -> formCaption = part.value
+                            }
+                            part.dispose()
+                        }
+                        is PartData.FileItem -> {
+                            val ext = part.getExtension()
+                            val fileName = part.provider().toInputStream().use { stream ->
+                                mediaStorageService.saveStream(stream, ext, subDir)
+                            }
+                            urls.add("uploads/$subDir/$fileName")
+                        }
+                        else -> part.dispose()
+                    }
+                }
+            } catch (e: Exception) {
+                errorMessage = e.message ?: "File upload failed"
+            }
+
+            if (errorMessage != null) {
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    ErrorResponse(errorMessage)
+                )
+                return
+            }
+            caption = formCaption
+            savedUrls = urls
+        } else {
+            try {
+                val jsonRequest = call.receive<CreatePostRequest>()
+                caption = jsonRequest.caption
+                savedUrls = jsonRequest.mediaUrls.map { bytes ->
+                    val fileName = mediaStorageService.saveBytes(bytes, subDir)
+                    "uploads/$subDir/$fileName"
+                }
+            } catch (_: Exception) {
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    ErrorResponse("Invalid request format")
+                )
+                return
+            }
         }
 
-        val result = createPostUseCase.execute(userId, postRequest)
+        val result = createPostUseCase.execute(userId, caption, savedUrls)
 
         result.onSuccess {
-            call.respond(HttpStatusCode.Created, it)
+            call.respond(HttpStatusCode.Created, it.withAbsoluteUrls(call))
         }.onFailure { ex ->
             call.respond(
                 HttpStatusCode.InternalServerError,
@@ -184,7 +241,7 @@ class PostController(
         val result = updatePostUseCase.execute(userId, postId, updateRequest)
 
         result.onSuccess {
-            call.respond(HttpStatusCode.OK, it)
+            call.respond(HttpStatusCode.OK, it.withAbsoluteUrls(call))
         }.onFailure { ex ->
             when (ex) {
                 is ForbiddenException, is ResourceNotFoundException -> throw ex

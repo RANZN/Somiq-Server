@@ -7,10 +7,11 @@ import io.ktor.server.http.content.staticFiles
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import org.koin.ktor.ext.inject
 import java.io.File
 
 fun Application.mediaRoutes() {
-    val mediaController = MediaController
+    val mediaController by inject<MediaController>()
     routing {
         route("/v1/media") {
             authenticate(JwtConfig.NAME) {

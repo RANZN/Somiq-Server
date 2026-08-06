@@ -11,7 +11,6 @@ import com.ranjan.data.post.model.PostLikeTable
 import com.ranjan.data.post.model.PostTable
 import com.ranjan.domain.common.model.PaginationRequest
 import com.ranjan.domain.common.model.PaginationResult
-import com.ranjan.domain.post.model.CreatePostRequest
 import com.ranjan.domain.post.model.PostResponse
 import com.ranjan.domain.post.model.ToggleResponse
 import com.ranjan.domain.post.model.UpdatePostRequest
@@ -31,15 +30,15 @@ class PostRepositoryImpl(
     // ------------------------------
     override suspend fun createPost(
         userId: UUID,
-        request: CreatePostRequest
+        caption: String,
+        mediaUrls: List<String>
     ): PostResponse = db.dbQuery {
         val postId = UUID.randomUUID().toString()
 
         PostTable.insert { row ->
             row[PostTable.postId] = postId
-            row[title] = request.title
-            row[content] = request.content
-            row[mediaUrls] = request.mediaUrls.toDbString()
+            row[PostTable.caption] = caption
+            row[PostTable.mediaUrls] = mediaUrls.toDbString()
             row[authorId] = userId
             row[createdAt] = timeProvider.nowMillis()
             row[updatedAt] = timeProvider.nowMillis()
@@ -106,8 +105,7 @@ class PostRepositoryImpl(
             val author = authors[row[PostTable.authorId]]!!
             PostResponse(
                 postId = postId,
-                title = row[PostTable.title],
-                content = row[PostTable.content],
+                caption = row[PostTable.caption],
                 mediaUrls = row[PostTable.mediaUrls].toMediaUrls(),
                 authorId = row[PostTable.authorId],
                 authorName = author[UserTable.name],
@@ -164,7 +162,7 @@ class PostRepositoryImpl(
             val row = postData[postId]!!
             val author = authors[row[PostTable.authorId]]!!
             PostResponse(
-                postId = postId, title = row[PostTable.title], content = row[PostTable.content],
+                postId = postId, caption = row[PostTable.caption],
                 mediaUrls = row[PostTable.mediaUrls].toMediaUrls(), authorId = row[PostTable.authorId],
                 authorName = author[UserTable.name], authorUsername = author[UserTable.username],
                 authorProfilePictureUrl = author[UserTable.profilePictureUrl],
@@ -211,7 +209,7 @@ class PostRepositoryImpl(
             val row = postData[postId]!!
             val author = authors[row[PostTable.authorId]]!!
             PostResponse(
-                postId = postId, title = row[PostTable.title], content = row[PostTable.content],
+                postId = postId, caption = row[PostTable.caption],
                 mediaUrls = row[PostTable.mediaUrls].toMediaUrls(), authorId = row[PostTable.authorId],
                 authorName = author[UserTable.name], authorUsername = author[UserTable.username],
                 authorProfilePictureUrl = author[UserTable.profilePictureUrl],
@@ -240,8 +238,7 @@ class PostRepositoryImpl(
             ?: throw ResourceNotFoundException("Post not found")
 
         PostTable.update({ PostTable.postId eq postId }) { row ->
-            row[title] = request.title ?: existing[PostTable.title]
-            row[content] = request.content ?: existing[PostTable.content]
+            row[caption] = request.caption ?: existing[PostTable.caption]
             row[mediaUrls] = request.mediaUrls?.toDbString() ?: existing[PostTable.mediaUrls]
             row[updatedAt] = timeProvider.nowMillis()
         }
@@ -328,8 +325,7 @@ class PostRepositoryImpl(
 
         return PostResponse(
             postId = postId,
-            title = post[PostTable.title],
-            content = post[PostTable.content],
+            caption = post[PostTable.caption],
             mediaUrls = post[PostTable.mediaUrls].toMediaUrls(),
             authorId = post[PostTable.authorId],
             authorName = post[UserTable.name],

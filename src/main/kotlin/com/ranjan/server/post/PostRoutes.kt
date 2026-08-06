@@ -16,11 +16,10 @@ fun Application.postRoutes() {
     val postController by inject<PostController>()
     routing {
         route("/v1/posts") {
-            get { postController.getPosts(call) }
-            get("/{id}") { postController.getPost(call) }
-
             // Requires Auth
             authenticate(JwtConfig.NAME) {
+                get { postController.getPosts(call) }
+                get("/{id}") { postController.getPost(call) }
                 get("bookmarks") { postController.getBookmarkedPosts(call) }
                 post { postController.createPost(call) }
                 put("/{id}") { postController.updatePost(call) }

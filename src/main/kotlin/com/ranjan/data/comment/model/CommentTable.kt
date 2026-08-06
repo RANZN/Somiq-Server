@@ -15,7 +15,7 @@ object CommentTable : Table("comment_table") {
         const val UPDATED_AT = "updated_at"
     }
 
-    val commentId = varchar(Columns.COMMENT_ID, 50).uniqueIndex()
+    val commentId = varchar(Columns.COMMENT_ID, 50)
     val content = text(Columns.CONTENT)
     val authorId = uuid(Columns.AUTHOR_ID).index().references(UserTable.userId)
     // postId and reelId are nullable - foreign key constraints removed (Exposed limitation with nullable FKs)

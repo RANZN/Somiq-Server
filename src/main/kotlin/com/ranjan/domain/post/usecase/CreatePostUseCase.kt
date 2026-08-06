@@ -1,6 +1,5 @@
 package com.ranjan.domain.post.usecase
 
-import com.ranjan.domain.post.model.CreatePostRequest
 import com.ranjan.domain.post.model.PostResponse
 import com.ranjan.domain.post.repository.PostRepository
 import java.util.UUID
@@ -10,12 +9,13 @@ class CreatePostUseCase(
 ) {
     suspend fun execute(
         userId: UUID,
-        request: CreatePostRequest
+        caption: String,
+        mediaUrls: List<String>
     ): Result<PostResponse> = runCatching {
 
-        if (request.content.isBlank()) {
-            throw IllegalArgumentException("Post content cannot be empty")
+        if (caption.isBlank() && mediaUrls.isEmpty()) {
+            throw IllegalArgumentException("Post must contain either a caption or media")
         }
-        postRepository.createPost(userId, request)
+        postRepository.createPost(userId, caption, mediaUrls)
     }
 }

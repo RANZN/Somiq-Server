@@ -44,16 +44,14 @@ class SearchRepositoryImpl(
         val posts = (PostTable innerJoin UserTable)
             .selectAll()
             .where {
-                (PostTable.title like searchPattern) or
-                (PostTable.content like searchPattern)
+                (PostTable.caption like searchPattern)
             }
             .orderBy(PostTable.createdAt, SortOrder.DESC)
             .limit(limit)
             .map { row ->
                 PostResponse(
                     postId = row[PostTable.postId],
-                    title = row[PostTable.title],
-                    content = row[PostTable.content],
+                    caption = row[PostTable.caption],
                     mediaUrls = row[PostTable.mediaUrls].toMediaUrls(),
                     authorId = row[PostTable.authorId],
                     authorName = row[UserTable.name],

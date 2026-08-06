@@ -13,7 +13,6 @@ import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.transactions.transaction
 
 class RefreshTokenRepoImpl(
     private val db: Database
@@ -38,16 +37,12 @@ class RefreshTokenRepoImpl(
         }.empty().not()
     }
 
-    override suspend fun deleteByUserId(userId: String) {
-        transaction {
-            RefreshTokenTable.deleteWhere { this.userId eq userId }
-        }
+    override suspend fun deleteByUserId(userId: String): Unit = db.dbQuery {
+        RefreshTokenTable.deleteWhere { this.userId eq userId }
     }
 
-    override suspend fun deleteByToken(token: String): Int {
-        return transaction {
-            RefreshTokenTable.deleteWhere { this.token eq token }
-        }
+    override suspend fun deleteByToken(token: String): Int = db.dbQuery {
+        RefreshTokenTable.deleteWhere { this.token eq token }
     }
 
     private fun toRefreshTokenEntity(row: ResultRow): RefreshTokenEntity {
