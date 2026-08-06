@@ -9,7 +9,8 @@ import com.ranjan.chat.domain.model.MessageType
 import com.ranjan.chat.domain.repository.ChatRepository
 
 class ChatRepositoryImpl(
-    private val conversationDataSource: ConversationDataSource, private val messageDataSource: MessageDataSource
+    private val conversationDataSource: ConversationDataSource,
+    private val messageDataSource: MessageDataSource,
 ) : ChatRepository {
 
     override suspend fun createConversation(

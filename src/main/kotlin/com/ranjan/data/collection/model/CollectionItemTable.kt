@@ -11,7 +11,7 @@ object CollectionItemTable : Table("collection_item_table") {
         const val ADDED_AT = "added_at"
     }
 
-    val itemId = varchar(Columns.ITEM_ID, 50).uniqueIndex()
+    val itemId = varchar(Columns.ITEM_ID, 50)
     val collectionId = varchar(Columns.COLLECTION_ID, 50).references(CollectionTable.collectionId, onDelete = org.jetbrains.exposed.sql.ReferenceOption.CASCADE)
     val itemType = varchar(Columns.ITEM_TYPE, 20)
     val itemRefId = varchar(Columns.ITEM_REF_ID, 50)

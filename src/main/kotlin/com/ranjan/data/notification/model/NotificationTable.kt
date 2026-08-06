@@ -16,7 +16,7 @@ object NotificationTable : Table("notification_table") {
         const val IS_READ = "is_read"
     }
 
-    val notificationId = varchar(Columns.NOTIFICATION_ID, 50).uniqueIndex()
+    val notificationId = varchar(Columns.NOTIFICATION_ID, 50)
     val userId = uuid(Columns.USER_ID).index().references(UserTable.userId, onDelete = org.jetbrains.exposed.sql.ReferenceOption.CASCADE)
     val type = varchar(Columns.TYPE, 50)
     val message = text(Columns.MESSAGE)

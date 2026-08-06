@@ -13,7 +13,7 @@ object StoryTable : Table("story_table") {
         const val EXPIRES_AT = "expires_at"
     }
 
-    val storyId = varchar(Columns.STORY_ID, 50).uniqueIndex()
+    val storyId = varchar(Columns.STORY_ID, 50)
     val mediaUrl = text(Columns.MEDIA_URL)
     val mediaType = varchar(Columns.MEDIA_TYPE, 20)
     val authorId = uuid(Columns.AUTHOR_ID).index().references(UserTable.userId, onDelete = org.jetbrains.exposed.sql.ReferenceOption.CASCADE)

@@ -4,6 +4,7 @@ import com.ranjan.server.account.AccountController
 import com.ranjan.server.auth.AuthController
 import com.ranjan.server.collection.CollectionController
 import com.ranjan.server.comment.CommentController
+import com.ranjan.server.media.*
 import com.ranjan.server.notification.NotificationController
 import com.ranjan.server.post.PostController
 import com.ranjan.server.reel.ReelController
@@ -13,6 +14,7 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 val appModule = module {
+    single<MediaStorageService> { LocalMediaStorageService() }
     singleOf(::AuthController)
     singleOf(::PostController)
     singleOf(::ReelController)
@@ -22,4 +24,5 @@ val appModule = module {
     singleOf(::CollectionController)
     singleOf(::SearchController)
     singleOf(::AccountController)
+    singleOf(::MediaController)
 }

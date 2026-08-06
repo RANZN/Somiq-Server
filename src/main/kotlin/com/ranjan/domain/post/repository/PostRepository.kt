@@ -12,7 +12,8 @@ interface PostRepository {
 
     suspend fun createPost(
         userId: UUID,
-        request: CreatePostRequest
+        caption: String,
+        mediaUrls: List<String>
     ): PostResponse
 
     suspend fun getPosts(

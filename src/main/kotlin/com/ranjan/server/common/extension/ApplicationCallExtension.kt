@@ -7,6 +7,10 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import java.util.*
+import io.ktor.server.plugins.origin
+import io.ktor.server.request.host
+import io.ktor.server.request.port
+import io.ktor.http.content.PartData
 
 fun ApplicationCall.userId(): UUID {
     val principal = this.principal<JWTPrincipal>()
@@ -45,4 +49,28 @@ fun ApplicationCall.getUserIdAndViewerId(): Pair<UUID, UUID?> {
         .getOrElse { throw UnauthorizedException() }
 
     return userId to viewerId
+}
+
+fun ApplicationCall.baseUrl(): String {
+    val request = this.request
+    return "${request.origin.scheme}://${request.host()}:${request.port()}"
+}
+
+fun PartData.FileItem.getExtension(): String {
+    val originalName = this.originalFileName
+    return if (originalName != null && originalName.contains('.')) {
+        originalName.substringAfterLast('.').lowercase()
+    } else {
+        val contentType = this.contentType
+        if (contentType != null) {
+            val subtype = contentType.contentSubtype.lowercase()
+            when (contentType.contentType.lowercase()) {
+                "video" -> if (subtype == "quicktime") "mov" else subtype.takeIf { it.isNotEmpty() } ?: "mp4"
+                "image" -> if (subtype == "jpeg") "jpg" else subtype.takeIf { it.isNotEmpty() } ?: "jpg"
+                else -> subtype.takeIf { it.isNotEmpty() } ?: "jpg"
+            }
+        } else {
+            "jpg"
+        }
+    }
 }

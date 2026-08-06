@@ -13,7 +13,7 @@ object CollectionTable : Table("collection_table") {
         const val UPDATED_AT = "updated_at"
     }
 
-    val collectionId = varchar(Columns.COLLECTION_ID, 50).uniqueIndex()
+    val collectionId = varchar(Columns.COLLECTION_ID, 50)
     val name = varchar(Columns.NAME, 255)
     val description = text(Columns.DESCRIPTION).nullable()
     val userId = uuid(Columns.USER_ID).index().references(UserTable.userId, onDelete = org.jetbrains.exposed.sql.ReferenceOption.CASCADE)

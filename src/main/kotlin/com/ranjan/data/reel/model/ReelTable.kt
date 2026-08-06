@@ -15,7 +15,7 @@ object ReelTable : Table("reel_table") {
         const val UPDATED_AT = "updated_at"
     }
 
-    val reelId = varchar(Columns.REEL_ID, 50).uniqueIndex()
+    val reelId = varchar(Columns.REEL_ID, 50)
     val title = varchar(Columns.TITLE, 255)
     val description = text(Columns.DESCRIPTION).nullable()
     val videoUrl = text(Columns.VIDEO_URL)
