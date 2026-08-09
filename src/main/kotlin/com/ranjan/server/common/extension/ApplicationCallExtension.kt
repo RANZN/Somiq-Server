@@ -52,8 +52,25 @@ fun ApplicationCall.getUserIdAndViewerId(): Pair<UUID, UUID?> {
 }
 
 fun ApplicationCall.baseUrl(): String {
-    val request = this.request
-    return "${request.origin.scheme}://${request.host()}:${request.port()}"
+    val headers = request.headers
+
+    val scheme = headers["X-Forwarded-Proto"] ?: request.origin.scheme
+    val host = headers["X-Forwarded-Host"] ?: request.host()
+    val forwardedPort = headers["X-Forwarded-Port"]?.toIntOrNull()
+
+    val port = forwardedPort ?: request.port()
+
+    val defaultPort = if (scheme.equals("https", ignoreCase = true)) 443 else 80
+
+    return buildString {
+        append(scheme)
+        append("://")
+        append(host)
+        port.takeUnless { it == defaultPort }?.let {
+            append(":")
+            append(it)
+        }
+    }
 }
 
 fun PartData.FileItem.getExtension(): String {
