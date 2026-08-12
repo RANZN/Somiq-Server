@@ -9,7 +9,6 @@ import io.ktor.server.auth.jwt.*
 import java.util.*
 import io.ktor.server.plugins.origin
 import io.ktor.server.request.host
-import io.ktor.server.request.port
 import io.ktor.http.content.PartData
 
 fun ApplicationCall.userId(): UUID {
@@ -58,18 +57,15 @@ fun ApplicationCall.baseUrl(): String {
     val host = headers["X-Forwarded-Host"] ?: request.host()
     val forwardedPort = headers["X-Forwarded-Port"]?.toIntOrNull()
 
-    val port = forwardedPort ?: request.port()
-
     val defaultPort = if (scheme.equals("https", ignoreCase = true)) 443 else 80
 
     return buildString {
         append(scheme)
         append("://")
         append(host)
-        port.takeUnless { it == defaultPort }?.let {
-            append(":")
-            append(it)
-        }
+        forwardedPort
+            ?.takeUnless { it == defaultPort }
+            ?.let { append(":$it") }
     }
 }
 
