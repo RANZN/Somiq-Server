@@ -9,7 +9,6 @@ import io.ktor.server.auth.jwt.*
 import java.util.*
 import io.ktor.server.plugins.origin
 import io.ktor.server.request.host
-import io.ktor.server.request.port
 import io.ktor.http.content.PartData
 
 fun ApplicationCall.userId(): UUID {
@@ -52,8 +51,22 @@ fun ApplicationCall.getUserIdAndViewerId(): Pair<UUID, UUID?> {
 }
 
 fun ApplicationCall.baseUrl(): String {
-    val request = this.request
-    return "${request.origin.scheme}://${request.host()}:${request.port()}"
+    val headers = request.headers
+
+    val scheme = headers["X-Forwarded-Proto"] ?: request.origin.scheme
+    val host = headers["X-Forwarded-Host"] ?: request.host()
+    val forwardedPort = headers["X-Forwarded-Port"]?.toIntOrNull()
+
+    val defaultPort = if (scheme.equals("https", ignoreCase = true)) 443 else 80
+
+    return buildString {
+        append(scheme)
+        append("://")
+        append(host)
+        forwardedPort
+            ?.takeUnless { it == defaultPort }
+            ?.let { append(":$it") }
+    }
 }
 
 fun PartData.FileItem.getExtension(): String {
