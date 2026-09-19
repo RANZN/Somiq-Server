@@ -1,5 +1,6 @@
 package com.ranjan.core.config
 
+import com.ranjan.core.db.DatabaseConfig
 import com.ranjan.core.storage.StorageConfig
 import com.ranjan.core.storage.StorageProvider
 import kotlin.test.Test
@@ -60,12 +61,21 @@ class AppConfigTest {
     }
 
     @Test
-    fun `test AppConfig determineStorageConfig`() {
-        val storage = AppConfig.determineStorageConfig(AppEnv.LOCAL)
+    fun `test StorageConfig get loads from Env`() {
+        val storage = StorageConfig.get()
         assertTrue(storage.provider.isLocal || storage.provider.isGcs)
-        assertEquals(storage.gcsBucket, storage.gcsBucket)
-        assertEquals(storage, AppConfig.determineStorageConfig())
-        assertEquals(storage, StorageConfig.get())
+        assertEquals(Env.gcsBucketName, storage.gcsBucket)
+    }
+
+    @Test
+    fun `test AppConfig load aggregates all subconfigs`() {
+        val appConfig = AppConfig.load()
+        assertEquals(Env.appEnv, appConfig.env)
+        assertEquals(StorageConfig.get(), appConfig.storage)
+        assertEquals(DatabaseConfig.get(), appConfig.database)
+        assertEquals(JwtConfig.get(), appConfig.jwt)
+        assertEquals(appConfig.storage.gcsBucket, appConfig.bucketName)
+        assertEquals(appConfig.database.url, appConfig.dbUrl)
     }
 
     @Test

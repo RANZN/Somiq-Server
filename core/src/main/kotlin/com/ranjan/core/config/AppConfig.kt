@@ -29,9 +29,5 @@ data class AppConfig(
                 dbUrl = database.url
             )
         }
-
-        fun determineStorageConfig(): StorageConfig = StorageConfig.get()
-
-        fun determineStorageConfig(env: AppEnv): StorageConfig = StorageConfig.get()
     }
 }
