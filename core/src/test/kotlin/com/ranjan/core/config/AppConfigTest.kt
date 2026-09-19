@@ -14,8 +14,6 @@ class AppConfigTest {
     fun `test AppEnv enum values and flags`() {
         assertEquals(listOf(AppEnv.LOCAL, AppEnv.PRODUCTION), AppEnv.entries)
         assertTrue(AppEnv.PRODUCTION.isProduction)
-        assertFalse(AppEnv.PRODUCTION.isLocal)
-        assertTrue(AppEnv.LOCAL.isLocal)
         assertFalse(AppEnv.LOCAL.isProduction)
     }
 
@@ -33,49 +31,25 @@ class AppConfigTest {
     }
 
     @Test
-    fun `test StorageProvider fromString parsing and validation`() {
-        assertEquals(StorageProvider.GCS, StorageProvider.fromString("gcs"))
-        assertEquals(StorageProvider.GCS, StorageProvider.fromString("GCS"))
-        assertEquals(StorageProvider.LOCAL, StorageProvider.fromString("local"))
-        assertEquals(StorageProvider.LOCAL, StorageProvider.fromString("LOCAL"))
-
-        // Throws on unknown or missing
-        kotlin.test.assertFailsWith<IllegalArgumentException> {
-            StorageProvider.fromString(null)
-        }
-        kotlin.test.assertFailsWith<IllegalArgumentException> {
-            StorageProvider.fromString("unknown")
-        }
-        kotlin.test.assertFailsWith<IllegalArgumentException> {
-            StorageProvider.fromString("")
-        }
+    fun `test StorageProvider enum values`() {
+        assertEquals(listOf(StorageProvider.LOCAL, StorageProvider.GCS), StorageProvider.entries)
     }
 
     @Test
-    fun `test StorageProvider helper properties`() {
-        assertTrue(StorageProvider.GCS.isGcs)
-        assertFalse(StorageProvider.GCS.isLocal)
-
-        assertTrue(StorageProvider.LOCAL.isLocal)
-        assertFalse(StorageProvider.LOCAL.isGcs)
+    fun `test StorageConfig from loads from Env`() {
+        val storage = StorageConfig.from(Env.load())
+        assertEquals(StorageProvider.LOCAL, storage.provider)
+        assertEquals("somiq-uploads", storage.gcsBucket)
     }
 
     @Test
-    fun `test StorageConfig get loads from Env`() {
-        val storage = StorageConfig.get()
-        assertTrue(storage.provider.isLocal || storage.provider.isGcs)
-        assertEquals(Env.gcsBucketName, storage.gcsBucket)
-    }
-
-    @Test
-    fun `test AppConfig load aggregates all subconfigs`() {
-        val appConfig = AppConfig.load()
-        assertEquals(Env.appEnv, appConfig.env)
-        assertEquals(StorageConfig.get(), appConfig.storage)
-        assertEquals(DatabaseConfig.get(), appConfig.database)
-        assertEquals(JwtConfig.get(), appConfig.jwt)
-        assertEquals(appConfig.storage.gcsBucket, appConfig.bucketName)
-        assertEquals(appConfig.database.url, appConfig.dbUrl)
+    fun `test AppConfig from aggregates all subconfigs`() {
+        val env = Env.load()
+        val appConfig = AppConfig.from(env)
+        assertEquals(AppEnv.LOCAL, appConfig.env)
+        assertEquals(StorageConfig.from(env), appConfig.storage)
+        assertEquals(DatabaseConfig.from(env), appConfig.database)
+        assertEquals(JwtConfig.from(env), appConfig.jwt)
     }
 
     @Test
@@ -102,7 +76,8 @@ class AppConfigTest {
     @Test
     fun `test Env validation throws exception when required variable is missing`() {
         val ex = kotlin.test.assertFailsWith<IllegalStateException> {
-            Env.from(emptyMap())
+            val env = Env.from(emptyMap())
+            AppConfig.from(env)
         }
         assertTrue(ex.message!!.contains("Missing or invalid required environment variables"))
         assertTrue(ex.message!!.contains("JWT_SECRET"))

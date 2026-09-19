@@ -44,19 +44,20 @@ data class JwtConfig(
     val signupTokenLifetimeMs: Long = signupTokenLifetime.inWholeMilliseconds
 
     companion object {
-        val NAME: String get() = Env.jwtAuthName
-        val AUTH_NAME: String get() = Env.jwtAuthName
+        val NAME: String by lazy { Env.load().require("JWT_AUTH_NAME") }
 
-        fun get(): JwtConfig = JwtConfig(
-            secret = Env.jwtSecret,
-            issuer = Env.jwtIssuer,
-            audience = Env.jwtAudience,
-            signupAudience = Env.jwtSignupAudience,
-            realm = Env.jwtAuthName,
-            accessTokenLifetime = Env.jwtAccessTokenLifetime,
-            refreshTokenLifetime = Env.jwtRefreshTokenLifetime,
-            signupTokenLifetime = Env.jwtSignupTokenLifetime
-        )
+        fun from(env: Env): JwtConfig {
+            val secret = env.require("JWT_SECRET")
+            val issuer = env.require("JWT_ISSUER")
+            val audience = env.require("JWT_AUDIENCE")
+            val signupAudience = env.require("JWT_SIGNUP_AUDIENCE")
+            val realm = env.require("JWT_AUTH_NAME")
+            val accessLifetime = env.duration("JWT_ACCESS_TOKEN_LIFETIME")
+            val refreshLifetime = env.duration("JWT_REFRESH_TOKEN_LIFETIME")
+            val signupLifetime = env.duration("JWT_SIGNUP_TOKEN_LIFETIME")
+            env.validate()
+            return JwtConfig(secret, issuer, audience, signupAudience, realm, accessLifetime, refreshLifetime, signupLifetime)
+        }
     }
 
     object Claims {

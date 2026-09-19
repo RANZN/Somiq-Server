@@ -5,5 +5,4 @@ enum class AppEnv {
     PRODUCTION;
 
     val isProduction: Boolean get() = this == PRODUCTION
-    val isLocal: Boolean get() = this == LOCAL
 }

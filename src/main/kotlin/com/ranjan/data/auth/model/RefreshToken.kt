@@ -10,7 +10,6 @@ object RefreshTokenTable : Table("refresh_tokens") {
         const val USER_ID = "user_id"
         const val TOKEN = "token"
         const val DEVICE_ID = "device_id"
-        const val EXPIRES_AT = "expires_at"
         const val CREATED_AT = "created_at"
     }
 
@@ -18,7 +17,6 @@ object RefreshTokenTable : Table("refresh_tokens") {
     val userId = varchar(Columns.USER_ID, 255)
     val token = varchar(Columns.TOKEN, 512)
     val deviceId = varchar(Columns.DEVICE_ID, 128).nullable()
-    val expiresAt = timestamp(Columns.EXPIRES_AT)
     val createdAt = timestamp(Columns.CREATED_AT).default(Clock.System.now())
     override val primaryKey = PrimaryKey(id)
 }

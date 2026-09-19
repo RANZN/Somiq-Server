@@ -8,25 +8,24 @@ data class AppConfig(
     val cors: CorsConfig,
     val storage: StorageConfig,
     val database: DatabaseConfig,
-    val jwt: JwtConfig,
-    val bucketName: String = storage.gcsBucket,
-    val dbUrl: String = database.url
+    val jwt: JwtConfig
 ) {
     companion object {
-        fun load(): AppConfig {
-            val env = Env.appEnv
-            val cors = CorsConfig.fromEnv(env)
-            val storage = StorageConfig.get()
-            val database = DatabaseConfig.get()
+        fun from(env: Env): AppConfig {
+            val appEnv = env.enum("APP_ENV", AppEnv.LOCAL)
+            val cors = runCatching { CorsConfig.from(env) }.getOrNull()
+            val storage = runCatching { StorageConfig.from(env) }.getOrNull()
+            val database = runCatching { DatabaseConfig.from(env) }.getOrNull()
+            val jwt = runCatching { JwtConfig.from(env) }.getOrNull()
+
+            env.validate()
 
             return AppConfig(
-                env = env,
-                cors = cors,
-                storage = storage,
-                database = database,
-                jwt = JwtConfig.get(),
-                bucketName = storage.gcsBucket,
-                dbUrl = database.url
+                env = appEnv,
+                cors = cors!!,
+                storage = storage!!,
+                database = database!!,
+                jwt = jwt!!
             )
         }
     }

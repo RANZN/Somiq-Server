@@ -39,8 +39,7 @@ class JwtConfigTest {
         assertEquals(2.hours.inWholeMilliseconds, config.accessTokenLifetimeMs)
         assertEquals(14.days.inWholeMilliseconds, config.refreshTokenLifetimeMs)
         assertEquals(15.minutes.inWholeMilliseconds, config.signupTokenLifetimeMs)
-        assertEquals(Env.jwtAuthName, JwtConfig.NAME)
-        assertEquals(Env.jwtAuthName, JwtConfig.AUTH_NAME)
+        assertEquals("auth-jwt", JwtConfig.NAME)
     }
 
     @Test
@@ -72,8 +71,8 @@ class JwtConfigTest {
     }
 
     @Test
-    fun `test JwtConfig fromEnv loads from environment`() {
-        val config = JwtConfig.get()
+    fun `test JwtConfig from loads from environment`() {
+        val config = JwtConfig.from(Env.load())
         assertEquals("local-development-secret-key-minimum-32-bytes-long!", config.secret)
         assertEquals("somiq-server", config.issuer)
         assertEquals("somiq-app", config.audience)
@@ -86,13 +85,8 @@ class JwtConfigTest {
 
     @Test
     fun `test JwtConfig fromEnv throws when variable is missing`() {
-        Env.testOverrides = emptyMap()
-        try {
-            assertFailsWith<IllegalStateException> {
-                JwtConfig.get()
-            }
-        } finally {
-            Env.testOverrides = null
+        assertFailsWith<IllegalStateException> {
+            JwtConfig.from(Env.from(emptyMap()))
         }
     }
 

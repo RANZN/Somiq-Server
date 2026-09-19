@@ -5,9 +5,14 @@ data class CorsConfig(
     val allowedHosts: List<String> = emptyList()
 ) {
     companion object {
-        fun fromEnv(env: AppEnv = Env.appEnv): CorsConfig = CorsConfig(
-            env = env,
-            allowedHosts = Env.allowedCorsHosts
-        )
+        fun from(env: Env): CorsConfig {
+            val appEnv = env.enum("APP_ENV", AppEnv.LOCAL)
+            val allowedHosts = env.list("ALLOWED_CORS_HOSTS")
+            env.validate()
+            return CorsConfig(
+                env = appEnv,
+                allowedHosts = allowedHosts
+            )
+        }
     }
 }

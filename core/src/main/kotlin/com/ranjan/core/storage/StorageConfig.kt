@@ -11,13 +11,22 @@ data class StorageConfig(
     val gcsPublicUrlPrefix: String = "https://storage.googleapis.com/$gcsBucket"
 ) {
     companion object {
-        fun get() = StorageConfig(
-            provider = Env.storageProvider,
-            gcsBucket = Env.gcsBucketName,
-            gcsProjectId = Env.gcsProjectId,
-            gcsCredentialsPath = Env.gcsCredentialsPath,
-            gcsCredentialsJson = Env.gcsCredentialsJson,
-            gcsPublicUrlPrefix = Env.gcsPublicUrlPrefix
-        )
+        fun from(env: Env): StorageConfig {
+            val provider = env.enum("STORAGE_PROVIDER", StorageProvider.LOCAL)
+            val gcsBucket = env.require("GCS_BUCKET_NAME")
+            val gcsProjectId = env.optional("GCS_PROJECT_ID")
+            val gcsCredentialsPath = env.optional("GCS_CREDENTIALS_PATH") ?: env.optional("GOOGLE_APPLICATION_CREDENTIALS")
+            val gcsCredentialsJson = env.optional("GCS_CREDENTIALS_JSON")
+            val gcsPublicUrlPrefix = env.require("GCS_PUBLIC_URL_PREFIX")
+            env.validate()
+            return StorageConfig(
+                provider = provider,
+                gcsBucket = gcsBucket,
+                gcsProjectId = gcsProjectId,
+                gcsCredentialsPath = gcsCredentialsPath,
+                gcsCredentialsJson = gcsCredentialsJson,
+                gcsPublicUrlPrefix = gcsPublicUrlPrefix
+            )
+        }
     }
 }

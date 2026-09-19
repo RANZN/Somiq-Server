@@ -2,6 +2,7 @@ package com.ranjan.core.di
 
 import com.ranjan.core.config.AppConfig
 import com.ranjan.core.config.CorsConfig
+import com.ranjan.core.config.Env
 import com.ranjan.core.config.JwtConfig
 import com.ranjan.core.util.*
 import com.ranjan.core.util.impl.*
@@ -12,7 +13,8 @@ import org.koin.dsl.module
 val coreModule = module {
     includes(databaseModule, storageModule)
 
-    single<AppConfig> { AppConfig.load() }
+    single<Env> { Env.load() }
+    single<AppConfig> { AppConfig.from(get()) }
     single<CorsConfig> { get<AppConfig>().cors }
     single<JwtConfig> { get<AppConfig>().jwt }
 

@@ -1,11 +1,9 @@
 package com.ranjan.data.auth.repository
 
-import com.ranjan.core.config.Env
 import com.ranjan.core.db.dbQuery
 import com.ranjan.data.auth.model.RefreshTokenTable
 import com.ranjan.domain.auth.model.RefreshTokenEntity
 import com.ranjan.domain.auth.repository.RefreshTokenRepo
-import kotlinx.datetime.Clock
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -19,12 +17,10 @@ class RefreshTokenRepoImpl(
 ) : RefreshTokenRepo {
 
     override suspend fun save(userId: String, refreshToken: String, deviceId: String): RefreshTokenEntity? = db.dbQuery {
-        val expiry = Clock.System.now().plus(Env.jwtRefreshTokenLifetime)
         val insertStatement = RefreshTokenTable.insert {
             it[this.userId] = userId
             it[this.token] = refreshToken
             it[this.deviceId] = deviceId
-            it[this.expiresAt] = expiry
         }
         insertStatement.resultedValues?.singleOrNull()?.let(::toRefreshTokenEntity)
     }
@@ -51,7 +47,6 @@ class RefreshTokenRepoImpl(
             userId = row[RefreshTokenTable.userId],
             token = row[RefreshTokenTable.token],
             deviceId = row[RefreshTokenTable.deviceId],
-            expiresAt = row[RefreshTokenTable.expiresAt],
             createdAt = row[RefreshTokenTable.createdAt]
         )
     }
