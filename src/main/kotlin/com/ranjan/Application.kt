@@ -2,8 +2,6 @@ package com.ranjan
 
 import com.ranjan.core.config.AppConfig
 import com.ranjan.core.di.coreModule
-import com.ranjan.core.di.databaseModule
-import com.ranjan.core.di.storageModule
 import com.ranjan.core.plugin.configureCORS
 import com.ranjan.core.plugin.configureExceptionHandling
 import com.ranjan.core.plugin.configureSecurity
@@ -38,7 +36,7 @@ fun Application.module() {
 fun Application.configureKoin() {
     install(Koin) {
         printLogger()
-        modules(coreModule, databaseModule, storageModule, dataModule, domainModule, appModule)
+        modules(coreModule, dataModule, domainModule, appModule)
     }
 }
 

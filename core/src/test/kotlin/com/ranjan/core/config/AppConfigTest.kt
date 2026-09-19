@@ -78,11 +78,7 @@ class AppConfigTest {
     @Test
     fun `test koin resolution of AppConfig, StorageConfig, and MediaStorageService`() {
         val koinApp = org.koin.dsl.koinApplication {
-            modules(
-                com.ranjan.core.di.coreModule,
-                com.ranjan.core.di.storageModule,
-                com.ranjan.core.di.databaseModule
-            )
+            modules(com.ranjan.core.di.coreModule)
         }
         val appConfig = koinApp.koin.get<AppConfig>()
         val storageConfig = koinApp.koin.get<StorageConfig>()
