@@ -37,3 +37,4 @@ out/
 
 ### local folders ###
 uploads
+.DS_Store

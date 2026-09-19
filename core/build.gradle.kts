@@ -26,4 +26,8 @@ dependencies {
     api(libs.ktor.server.status.pages)
     api(libs.ktor.server.io)
     api(libs.auth0.jwt)
+    api(libs.google.cloud.storage)
+
+    testImplementation(libs.kotlin.test.junit)
 }
+
