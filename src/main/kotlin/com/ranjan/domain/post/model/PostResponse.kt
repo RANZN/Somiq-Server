@@ -2,9 +2,8 @@ package com.ranjan.domain.post.model
 
 import com.ranjan.core.util.UUIDSerializer
 import com.ranjan.domain.common.model.PaginationResult
-import com.ranjan.server.common.extension.baseUrl
-import io.ktor.server.application.ApplicationCall
 import kotlinx.serialization.Serializable
+import com.ranjan.core.storage.MediaStorageService
 import java.util.UUID
 
 @Serializable
@@ -27,21 +26,16 @@ data class PostResponse(
     val isBookmarked: Boolean = false
 )
 
-fun PostResponse.withAbsoluteUrls(call: ApplicationCall): PostResponse {
-    val baseUrl = call.baseUrl()
+fun PostResponse.withAbsoluteUrls(baseUrl: String, mediaStorageService: MediaStorageService): PostResponse {
     return this.copy(
         mediaUrls = this.mediaUrls.map { relativeUrl ->
-            if (relativeUrl.startsWith("http://") || relativeUrl.startsWith("https://")) {
-                relativeUrl
-            } else {
-                "$baseUrl/$relativeUrl"
-            }
+            mediaStorageService.getUrlForRelativePath(baseUrl, relativeUrl)
         }
     )
 }
 
-fun PaginationResult<PostResponse>.withAbsoluteUrls(call: ApplicationCall): PaginationResult<PostResponse> {
+fun PaginationResult<PostResponse>.withAbsoluteUrls(baseUrl: String, mediaStorageService: MediaStorageService): PaginationResult<PostResponse> {
     return this.copy(
-        data = this.data.map { it.withAbsoluteUrls(call) }
+        data = this.data.map { it.withAbsoluteUrls(baseUrl, mediaStorageService) }
     )
 }

@@ -12,6 +12,7 @@ import io.ktor.server.application.ApplicationCall
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
 import io.ktor.utils.io.jvm.javaio.toInputStream
+import com.ranjan.core.storage.MediaStorageService
 import kotlinx.serialization.Serializable
 import kotlinx.datetime.Clock
 
@@ -19,8 +20,6 @@ class MediaController(
     private val mediaStorageService: MediaStorageService,
     private val userRepository: UserRepository
 ) {
-
-
 
     suspend fun uploadMedia(call: ApplicationCall) {
         val userId = try {
@@ -59,6 +58,7 @@ class MediaController(
                         errorMessage = e.message ?: "Upload failed"
                     }
                 }
+
                 else -> part.dispose()
             }
         }
@@ -70,12 +70,14 @@ class MediaController(
                     ErrorResponse(errorMessage)
                 )
             }
+
             fileName == null -> {
                 call.respond(
                     HttpStatusCode.BadRequest,
                     ErrorResponse("No file in request. Use multipart form field 'file'.")
                 )
             }
+
             else -> {
                 val url = mediaStorageService.getUrlForFile(call.baseUrl(), subDir, fileName)
                 call.respond(HttpStatusCode.Created, UploadResponse(url))

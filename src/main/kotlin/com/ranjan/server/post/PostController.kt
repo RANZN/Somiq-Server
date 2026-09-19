@@ -12,7 +12,8 @@ import com.ranjan.domain.post.usecase.*
 import com.ranjan.server.common.extension.getExtension
 import com.ranjan.server.common.extension.userId
 import com.ranjan.server.common.extension.userIdOrNull
-import com.ranjan.server.media.MediaStorageService
+import com.ranjan.server.common.extension.baseUrl
+import com.ranjan.core.storage.MediaStorageService
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
@@ -69,7 +70,7 @@ class PostController(
         }
 
         result.onSuccess {
-            call.respond(HttpStatusCode.OK, it.withAbsoluteUrls(call))
+            call.respond(HttpStatusCode.OK, it.withAbsoluteUrls(call.baseUrl(), mediaStorageService))
         }.onFailure {
             call.respond(
                 HttpStatusCode.InternalServerError,
@@ -94,7 +95,7 @@ class PostController(
             limit = params["limit"]?.toIntOrNull() ?: 20
         )
         getBookmarkedPostsUseCase.execute(userId, pagination)
-            .onSuccess { call.respond(HttpStatusCode.OK, it.withAbsoluteUrls(call)) }
+            .onSuccess { call.respond(HttpStatusCode.OK, it.withAbsoluteUrls(call.baseUrl(), mediaStorageService)) }
             .onFailure {
                 call.respond(HttpStatusCode.InternalServerError, ErrorResponse("Failed to load bookmarked posts"))
             }
@@ -114,7 +115,7 @@ class PostController(
         val result = getPostByIdUseCase.execute(postId)
 
         result.onSuccess {
-            call.respond(HttpStatusCode.OK, it.withAbsoluteUrls(call))
+            call.respond(HttpStatusCode.OK, it.withAbsoluteUrls(call.baseUrl(), mediaStorageService))
         }.onFailure { ex ->
             when (ex) {
                 is ResourceNotFoundException -> throw ex
@@ -202,7 +203,7 @@ class PostController(
         val result = createPostUseCase.execute(userId, caption, savedUrls)
 
         result.onSuccess {
-            call.respond(HttpStatusCode.Created, it.withAbsoluteUrls(call))
+            call.respond(HttpStatusCode.Created, it.withAbsoluteUrls(call.baseUrl(), mediaStorageService))
         }.onFailure { ex ->
             call.respond(
                 HttpStatusCode.InternalServerError,
@@ -241,7 +242,7 @@ class PostController(
         val result = updatePostUseCase.execute(userId, postId, updateRequest)
 
         result.onSuccess {
-            call.respond(HttpStatusCode.OK, it.withAbsoluteUrls(call))
+            call.respond(HttpStatusCode.OK, it.withAbsoluteUrls(call.baseUrl(), mediaStorageService))
         }.onFailure { ex ->
             when (ex) {
                 is ForbiddenException, is ResourceNotFoundException -> throw ex
