@@ -3,7 +3,7 @@ package com.ranjan.server
 import com.ranjan.chat.api.chatSocketRoutes
 import com.ranjan.chat.api.conversationRoutes
 import com.ranjan.chat.api.messageRoutes
-import com.ranjan.data.auth.service.JwtConfig
+import com.ranjan.core.config.JwtConfig
 import com.ranjan.server.account.accountRoutes
 import com.ranjan.server.auth.authRoutes
 import com.ranjan.server.collection.collectionRoutes

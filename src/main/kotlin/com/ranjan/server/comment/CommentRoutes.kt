@@ -1,6 +1,6 @@
 package com.ranjan.server.comment
 
-import com.ranjan.data.auth.service.JwtConfig
+import com.ranjan.core.config.JwtConfig
 import io.ktor.server.application.Application
 import io.ktor.server.auth.authenticate
 import io.ktor.server.routing.delete
