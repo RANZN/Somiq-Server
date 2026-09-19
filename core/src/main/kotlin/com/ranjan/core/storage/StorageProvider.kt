@@ -1,7 +1,5 @@
 package com.ranjan.core.storage
 
-import com.ranjan.core.config.AppEnv
-
 enum class StorageProvider {
     LOCAL,
     GCS;
@@ -10,9 +8,12 @@ enum class StorageProvider {
     val isLocal: Boolean get() = this == LOCAL
 
     companion object {
-        fun fromString(value: String?, env: AppEnv = AppEnv.LOCAL): StorageProvider {
-            return entries.firstOrNull { it.name.equals(value, ignoreCase = true) }
-                ?: if (env.isProduction) GCS else LOCAL
+        fun fromString(value: String?): StorageProvider {
+            val trimmed = value?.trim()
+            return entries.firstOrNull { it.name.equals(trimmed, ignoreCase = true) }
+                ?: throw IllegalArgumentException(
+                    "Missing or invalid STORAGE_PROVIDER: '$value'. Must be one of: ${entries.joinToString()}"
+                )
         }
     }
 }

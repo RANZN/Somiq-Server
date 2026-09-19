@@ -1,6 +1,6 @@
 package com.ranjan.data.auth.repository
 
-import com.ranjan.core.config.JwtConfig
+import com.ranjan.core.config.Env
 import com.ranjan.core.db.dbQuery
 import com.ranjan.data.auth.model.RefreshTokenTable
 import com.ranjan.domain.auth.model.RefreshTokenEntity
@@ -19,7 +19,7 @@ class RefreshTokenRepoImpl(
 ) : RefreshTokenRepo {
 
     override suspend fun save(userId: String, refreshToken: String, deviceId: String): RefreshTokenEntity? = db.dbQuery {
-        val expiry = Clock.System.now().plus(JwtConfig.Lifetime.refresh)
+        val expiry = Clock.System.now().plus(Env.jwtRefreshTokenLifetime)
         val insertStatement = RefreshTokenTable.insert {
             it[this.userId] = userId
             it[this.token] = refreshToken

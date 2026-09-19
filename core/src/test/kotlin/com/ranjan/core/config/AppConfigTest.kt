@@ -10,24 +10,11 @@ import kotlin.test.assertTrue
 class AppConfigTest {
 
     @Test
-    fun `test AppEnv fromString parsing and defaults`() {
-        assertEquals(AppEnv.LOCAL, AppEnv.fromString("LOCAL"))
-        assertEquals(AppEnv.LOCAL, AppEnv.fromString("local"))
-        assertEquals(AppEnv.STAGING, AppEnv.fromString("STAGING"))
-        assertEquals(AppEnv.STAGING, AppEnv.fromString("staging"))
-        assertEquals(AppEnv.PRODUCTION, AppEnv.fromString("PRODUCTION"))
-        assertEquals(AppEnv.PRODUCTION, AppEnv.fromString("production"))
-
-        // Fallback default
-        assertEquals(AppEnv.STAGING, AppEnv.fromString("UNKNOWN"))
-        assertEquals(AppEnv.STAGING, AppEnv.fromString(null))
-        assertEquals(AppEnv.STAGING, AppEnv.fromString(""))
-    }
-
-    @Test
-    fun `test AppEnv isProduction flag`() {
+    fun `test AppEnv enum values and flags`() {
+        assertEquals(listOf(AppEnv.LOCAL, AppEnv.PRODUCTION), AppEnv.entries)
         assertTrue(AppEnv.PRODUCTION.isProduction)
-        assertFalse(AppEnv.STAGING.isProduction)
+        assertFalse(AppEnv.PRODUCTION.isLocal)
+        assertTrue(AppEnv.LOCAL.isLocal)
         assertFalse(AppEnv.LOCAL.isProduction)
     }
 
@@ -45,18 +32,22 @@ class AppConfigTest {
     }
 
     @Test
-    fun `test StorageProvider fromString parsing and fallback`() {
+    fun `test StorageProvider fromString parsing and validation`() {
         assertEquals(StorageProvider.GCS, StorageProvider.fromString("gcs"))
         assertEquals(StorageProvider.GCS, StorageProvider.fromString("GCS"))
         assertEquals(StorageProvider.LOCAL, StorageProvider.fromString("local"))
         assertEquals(StorageProvider.LOCAL, StorageProvider.fromString("LOCAL"))
 
-        // When null or unknown, fallback depends on AppEnv
-        assertEquals(StorageProvider.LOCAL, StorageProvider.fromString(null, AppEnv.LOCAL))
-        assertEquals(StorageProvider.LOCAL, StorageProvider.fromString("unknown", AppEnv.LOCAL))
-        assertEquals(StorageProvider.LOCAL, StorageProvider.fromString(null, AppEnv.STAGING))
-        assertEquals(StorageProvider.GCS, StorageProvider.fromString(null, AppEnv.PRODUCTION))
-        assertEquals(StorageProvider.GCS, StorageProvider.fromString("unknown", AppEnv.PRODUCTION))
+        // Throws on unknown or missing
+        kotlin.test.assertFailsWith<IllegalArgumentException> {
+            StorageProvider.fromString(null)
+        }
+        kotlin.test.assertFailsWith<IllegalArgumentException> {
+            StorageProvider.fromString("unknown")
+        }
+        kotlin.test.assertFailsWith<IllegalArgumentException> {
+            StorageProvider.fromString("")
+        }
     }
 
     @Test
@@ -71,8 +62,10 @@ class AppConfigTest {
     @Test
     fun `test AppConfig determineStorageConfig`() {
         val storage = AppConfig.determineStorageConfig(AppEnv.LOCAL)
-        assertTrue(storage.isLocal || storage.isGcs)
+        assertTrue(storage.provider.isLocal || storage.provider.isGcs)
         assertEquals(storage.gcsBucket, storage.gcsBucket)
+        assertEquals(storage, AppConfig.determineStorageConfig())
+        assertEquals(storage, StorageConfig.get())
     }
 
     @Test
@@ -94,6 +87,17 @@ class AppConfigTest {
 
         val database = koinApp.koin.get<org.jetbrains.exposed.sql.Database>()
         kotlin.test.assertNotNull(database)
+    }
+
+    @Test
+    fun `test Env validation throws exception when required variable is missing`() {
+        val ex = kotlin.test.assertFailsWith<IllegalStateException> {
+            Env.from(emptyMap())
+        }
+        assertTrue(ex.message!!.contains("Missing or invalid required environment variables"))
+        assertTrue(ex.message!!.contains("JWT_SECRET"))
+        assertTrue(ex.message!!.contains("DB_DRIVER"))
+        assertTrue(ex.message!!.contains("JWT_ACCESS_TOKEN_LIFETIME"))
     }
 }
 

@@ -9,14 +9,25 @@ import kotlin.test.assertNotNull
 class DatabaseConfigTest {
 
     @Test
-    fun `test DatabaseConfig fromEnv defaults for local and production`() {
-        val localConfig = DatabaseConfig.fromEnv(AppEnv.LOCAL)
-        assertEquals("org.h2.Driver", localConfig.driver)
-        assertEquals(5, localConfig.maxPoolSize)
+    fun `test DatabaseConfig fromEnv loads from environment`() {
+        val config = DatabaseConfig.get()
+        assertEquals("org.h2.Driver", config.driver)
+        assertEquals("jdbc:h2:file:./build/db;DB_CLOSE_DELAY=-1", config.url)
+        assertEquals("root", config.user)
+        assertEquals("", config.password)
+        assertEquals(5, config.maxPoolSize)
+    }
 
-        val prodConfig = DatabaseConfig.fromEnv(AppEnv.PRODUCTION)
-        assertEquals("org.postgresql.Driver", prodConfig.driver)
-        assertEquals(10, prodConfig.maxPoolSize)
+    @Test
+    fun `test DatabaseConfig fromEnv throws when variable is missing`() {
+        com.ranjan.core.config.Env.testOverrides = emptyMap()
+        try {
+            kotlin.test.assertFailsWith<IllegalStateException> {
+                DatabaseConfig.get()
+            }
+        } finally {
+            com.ranjan.core.config.Env.testOverrides = null
+        }
     }
 
     @Test

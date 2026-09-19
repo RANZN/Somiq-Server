@@ -5,7 +5,7 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 
-fun Application.configureSecurity(config: JwtConfig = JwtConfig.fromEnv()) {
+fun Application.configureSecurity(config: JwtConfig) {
     install(Authentication) {
         jwt(config.realm) {
             verifier(config.verifier)
