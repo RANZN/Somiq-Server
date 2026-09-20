@@ -4,6 +4,7 @@ import com.ranjan.core.db.dbQuery
 import com.ranjan.data.auth.model.UserTable
 import com.ranjan.data.notification.model.NotificationTable
 import org.jetbrains.exposed.sql.Database
+import com.ranjan.core.util.TimeProvider
 import com.ranjan.domain.common.model.PaginationRequest
 import com.ranjan.domain.common.model.PaginationResult
 import com.ranjan.domain.notification.model.NotificationResponse
@@ -13,7 +14,8 @@ import org.jetbrains.exposed.sql.*
 import java.util.UUID
 
 class NotificationRepositoryImpl(
-    private val db: Database
+    private val db: Database,
+    private val timeProvider: TimeProvider,
 ) : NotificationRepository {
 
     override suspend fun createNotification(
@@ -34,7 +36,7 @@ class NotificationRepositoryImpl(
             row[NotificationTable.actorId] = actorId
             row[NotificationTable.targetId] = targetId
             row[NotificationTable.targetType] = targetType
-            row[NotificationTable.createdAt] = System.currentTimeMillis()
+            row[NotificationTable.createdAt] = timeProvider.nowMillis()
             row[NotificationTable.isRead] = false
         }
 

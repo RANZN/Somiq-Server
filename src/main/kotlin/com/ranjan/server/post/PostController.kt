@@ -14,6 +14,7 @@ import com.ranjan.server.common.extension.userId
 import com.ranjan.server.common.extension.userIdOrNull
 import com.ranjan.server.common.extension.baseUrl
 import com.ranjan.core.storage.MediaStorageService
+import com.ranjan.core.util.TimeProvider
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
@@ -33,6 +34,7 @@ class PostController(
     private val toggleLikeUseCase: ToggleLikeUseCase,
     private val toggleBookmarkUseCase: ToggleBookmarkUseCase,
     private val mediaStorageService: MediaStorageService,
+    private val timeProvider: TimeProvider,
 ) {
 
     // ---------------------------------------------------------
@@ -139,7 +141,7 @@ class PostController(
             return
         }
 
-        val postTimePrefix = System.currentTimeMillis().toString()
+        val postTimePrefix = timeProvider.nowMillis().toString()
         val subDir = "${userId}/posts/$postTimePrefix"
 
         val caption: String

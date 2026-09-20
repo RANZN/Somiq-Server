@@ -1,6 +1,7 @@
 package com.ranjan.data.auth.repository
 
 import com.ranjan.core.db.dbQuery
+import com.ranjan.core.util.TimeProvider
 import com.ranjan.data.auth.model.RefreshTokenTable
 import com.ranjan.domain.auth.model.RefreshTokenEntity
 import com.ranjan.domain.auth.repository.RefreshTokenRepo
@@ -13,7 +14,8 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 
 class RefreshTokenRepoImpl(
-    private val db: Database
+    private val db: Database,
+    private val timeProvider: TimeProvider,
 ) : RefreshTokenRepo {
 
     override suspend fun save(userId: String, refreshToken: String, deviceId: String): RefreshTokenEntity? = db.dbQuery {
@@ -21,6 +23,7 @@ class RefreshTokenRepoImpl(
             it[this.userId] = userId
             it[this.token] = refreshToken
             it[this.deviceId] = deviceId
+            it[this.createdAt] = timeProvider.now()
         }
         insertStatement.resultedValues?.singleOrNull()?.let(::toRefreshTokenEntity)
     }
