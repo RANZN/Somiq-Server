@@ -58,7 +58,7 @@ class Env(private val raw: Map<String, String>) {
     val hasErrors: Boolean get() = errors.isNotEmpty()
 
     fun validate() {
-        if (errors.isNotEmpty()) {
+        if (hasErrors) {
             throw IllegalStateException(
                 "Missing or invalid required environment variables:\n" +
                     errors.distinct().joinToString("\n") { "  - $it" } +
@@ -82,7 +82,12 @@ class Env(private val raw: Map<String, String>) {
         }
 
         private fun loadDotEnv(): Map<String, String> {
-            val candidates = listOf(
+            val customEnv = System.getenv("ENV_FILE")?.let { File(it) }
+            val candidates = listOfNotNull(
+                customEnv,
+                File("/secrets/.env"),
+                File("/secrets/somiq-env"),
+                File("/secrets/env"),
                 File(".env.local"), File(".env"),
                 File("../.env.local"), File("../.env"),
                 File("../../.env.local"), File("../../.env")

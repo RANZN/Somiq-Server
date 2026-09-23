@@ -1,7 +1,6 @@
 package com.ranjan.core.config
 
 import com.ranjan.core.db.DatabaseConfig
-import com.ranjan.core.storage.StorageConfig
 
 data class AppConfig(
     val env: AppEnv,
