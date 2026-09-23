@@ -3,7 +3,7 @@ package com.ranjan.core.storage.gcs
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.cloud.storage.Storage
 import com.google.cloud.storage.StorageOptions
-import com.ranjan.core.storage.StorageConfig
+import com.ranjan.core.config.StorageConfig
 import java.io.FileInputStream
 
 object GcsClientFactory {

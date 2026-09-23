@@ -1,7 +1,6 @@
 package com.ranjan.core.config
 
 import com.ranjan.core.db.DatabaseConfig
-import com.ranjan.core.storage.StorageConfig
 import com.ranjan.core.storage.StorageProvider
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -59,7 +58,7 @@ class AppConfigTest {
         }
         val appConfig = koinApp.koin.get<AppConfig>()
         val storageConfig = koinApp.koin.get<StorageConfig>()
-        val dbConfig = koinApp.koin.get<com.ranjan.core.db.DatabaseConfig>()
+        val dbConfig = koinApp.koin.get<DatabaseConfig>()
         val jwtConfig = koinApp.koin.get<JwtConfig>()
 
         assertEquals(appConfig.storage, storageConfig)

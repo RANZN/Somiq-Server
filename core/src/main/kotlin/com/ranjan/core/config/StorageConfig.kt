@@ -1,6 +1,6 @@
-package com.ranjan.core.storage
+package com.ranjan.core.config
 
-import com.ranjan.core.config.Env
+import com.ranjan.core.storage.StorageProvider
 
 data class StorageConfig(
     val provider: StorageProvider = StorageProvider.LOCAL,

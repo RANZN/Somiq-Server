@@ -3,7 +3,7 @@ package com.ranjan.core.di
 import com.google.cloud.storage.Storage
 import com.ranjan.core.config.AppConfig
 import com.ranjan.core.storage.MediaStorageService
-import com.ranjan.core.storage.StorageConfig
+import com.ranjan.core.config.StorageConfig
 import com.ranjan.core.storage.StorageProvider
 import com.ranjan.core.storage.gcs.GcsClientFactory
 import com.ranjan.core.storage.gcs.GcsMediaStorageService
