@@ -9,6 +9,7 @@ jwt = "4.4.0"
 jbcrypt = "0.4"
 koinKtor = "4.1.1"
 postgresql = "42.7.2"
+googleCloudStorage = "2.35.0"
 
 [libraries]
 ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
@@ -35,6 +36,7 @@ ktor-server-auth = { module = "io.ktor:ktor-server-auth", version.ref = "ktor" }
 ktor-server-auth-jwt = { module = "io.ktor:ktor-server-auth-jwt", version.ref = "ktor" }
 ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+google-cloud-storage = { module = "com.google.cloud:google-cloud-storage", version.ref = "googleCloudStorage" }
 
 # Ktor Client dependencies for chat module
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }

@@ -1,5 +1,6 @@
-package com.ranjan.core.util
+package com.ranjan.core.util.impl
 
+import com.ranjan.core.util.TimeProvider
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 

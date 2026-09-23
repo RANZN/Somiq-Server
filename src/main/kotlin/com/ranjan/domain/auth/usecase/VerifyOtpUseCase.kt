@@ -6,13 +6,15 @@ import com.ranjan.domain.auth.model.VerifyOtpRequest
 import com.ranjan.domain.auth.model.VerifyOtpResponse
 import com.ranjan.domain.auth.repository.RefreshTokenRepo
 import com.ranjan.domain.auth.repository.UserRepository
-import com.ranjan.domain.auth.services.TokenProvider
+import com.ranjan.domain.auth.services.AuthTokenProvider
+import com.ranjan.domain.auth.services.SignupTokenService
 import com.ranjan.domain.auth.util.normalizePhone
 
 class VerifyOtpUseCase(
     private val userRepository: UserRepository,
     private val refreshTokenRepo: RefreshTokenRepo,
-    private val tokenProvider: TokenProvider,
+    private val authTokenProvider: AuthTokenProvider,
+    private val signupTokenService: SignupTokenService,
 ) {
 
     suspend fun execute(request: VerifyOtpRequest): Result<VerifyOtpResponse> = runCatching {
@@ -23,7 +25,7 @@ class VerifyOtpUseCase(
 
         val existing = userRepository.findByPhone(phone)
         if (existing != null) {
-            val token = tokenProvider.createToken(existing, request.deviceId)
+            val token = authTokenProvider.createToken(existing, request.deviceId)
             refreshTokenRepo.save(existing.userId.toString(), token.refreshToken, request.deviceId)
             VerifyOtpResponse(
                 status = OtpVerifyStatus.LOGGED_IN,
@@ -31,7 +33,7 @@ class VerifyOtpUseCase(
                 user = existing.asResponse(),
             )
         } else {
-            val signupToken = tokenProvider.createSignupToken(phone, request.deviceId)
+            val signupToken = signupTokenService.createSignupToken(phone, request.deviceId)
             VerifyOtpResponse(
                 status = OtpVerifyStatus.SIGNUP_REQUIRED,
                 signupToken = signupToken,

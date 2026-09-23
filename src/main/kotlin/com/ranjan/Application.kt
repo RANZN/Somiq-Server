@@ -1,11 +1,11 @@
 package com.ranjan
 
-import com.ranjan.core.config.configureCORS
-import com.ranjan.core.config.configureExceptionHandling
-import com.ranjan.core.config.configureSecurity
-import com.ranjan.core.config.configureSerialization
+import com.ranjan.core.config.AppConfig
 import com.ranjan.core.di.coreModule
-import com.ranjan.core.di.databaseModule
+import com.ranjan.core.plugin.configureCORS
+import com.ranjan.core.plugin.configureExceptionHandling
+import com.ranjan.core.plugin.configureSecurity
+import com.ranjan.core.plugin.configureSerialization
 import com.ranjan.data.di.dataModule
 import com.ranjan.data.sources.db.SchemaInitializer
 import com.ranjan.domain.di.domainModule
@@ -24,18 +24,19 @@ fun main(args: Array<String>) {
 @Suppress("unused")
 fun Application.module() {
     configureKoin()
+    val config: AppConfig by inject()
     configureDatabase()
     configureSerialization()
-    configureSecurity()
+    configureSecurity(config.jwt)
     configureRoutes()
     configureExceptionHandling()
-    configureCORS()
+    configureCORS(config.cors)
 }
 
 fun Application.configureKoin() {
     install(Koin) {
         printLogger()
-        modules(coreModule, databaseModule, dataModule, domainModule, appModule)
+        modules(coreModule, dataModule, domainModule, appModule)
     }
 }
 

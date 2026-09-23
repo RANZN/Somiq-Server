@@ -3,14 +3,17 @@ package com.ranjan.chat.data.datasource
 import com.ranjan.chat.data.entity.MessageTable
 import com.ranjan.chat.domain.model.Message
 import com.ranjan.chat.domain.model.MessageType
-import kotlinx.datetime.Clock
+import com.ranjan.core.util.TimeProvider
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
-class MessageDataSource(private val database: Database) {
+class MessageDataSource(
+    private val database: Database,
+    private val timeProvider: TimeProvider,
+) {
     suspend fun saveMessage(id: String, conversationId: String, senderId: String, content: String, type: MessageType): Message {
         return transaction(database) {
-            val now = Clock.System.now()
+            val now = timeProvider.now()
             MessageTable.insert {
                 it[this.id] = id
                 it[this.conversationId] = conversationId
