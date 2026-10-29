@@ -5,3 +5,4 @@ build
 out
 uploads
 *.jar
+!build/libs/Somiq-server-all.jar
