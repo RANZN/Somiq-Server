@@ -1,25 +1,10 @@
-# -------------------------------
-# Stage 1: Build the fat JAR
-# -------------------------------
-FROM eclipse-temurin:17-jdk-focal AS builder
-
-WORKDIR /app
-
-# Copy the entire project source code and configurations
-COPY . .
-
-# Make wrapper executable & build shadow JAR
-RUN chmod +x ./gradlew && ./gradlew shadowJar --no-daemon
-
-# -------------------------------
-# Stage 2: Minimal runtime image
-# -------------------------------
+# Production runtime image for Zoho Catalyst AppSail / Docker
 FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
-# Copy only the shadow JAR, rename to app.jar
-COPY --from=builder /app/build/libs/*-all.jar app.jar
+# Copy the fat JAR built by Gradle
+COPY build/libs/Somiq-server-all.jar app.jar
 
 EXPOSE 8080
 

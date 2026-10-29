@@ -1,0 +1,70 @@
+name: Deploy Somiq-Server to Zoho Catalyst
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: catalyst-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      - name: Make Gradle Wrapper Executable
+        run: chmod +x ./gradlew
+
+      - name: Build Fat JAR
+        run: ./gradlew buildFatJar --no-daemon
+
+      - name: Build Docker image (linux/amd64)
+        run: |
+          docker build \
+            --platform linux/amd64 \
+            -t somiq-server:latest .
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Zoho Catalyst CLI
+        run: npm install -g zcatalyst-cli
+
+      - name: Deploy to Zoho Catalyst AppSail
+        env:
+          CATALYST_TOKEN: ${{ secrets.CATALYST_TOKEN }}
+          CATALYST_PROJECT_ID: ${{ secrets.CATALYST_PROJECT_ID }}
+          CATALYST_ORG_ID: ${{ secrets.CATALYST_ORG_ID }}
+          CATALYST_DC: ${{ secrets.CATALYST_DC }}
+        run: |
+          DC_ARG=""
+          if [ -n "$CATALYST_DC" ]; then
+            DC_ARG="--dc $CATALYST_DC"
+          fi
+
+          catalyst deploy appsail \
+            --name somiq-server \
+            --source docker://somiq-server:latest \
+            --port 8080 \
+            --project "$CATALYST_PROJECT_ID" \
+            --org "$CATALYST_ORG_ID" \
+            --token "$CATALYST_TOKEN" \
+            $DC_ARG
