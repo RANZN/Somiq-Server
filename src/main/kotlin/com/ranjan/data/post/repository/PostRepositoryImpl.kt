@@ -275,7 +275,7 @@ class PostRepositoryImpl(
         if (alreadyLiked) {
             PostLikeTable.deleteWhere { (PostLikeTable.userId eq userId) and (PostLikeTable.postId eq postId) }
         } else {
-            PostLikeTable.insert {
+            PostLikeTable.insertIgnore {
                 it[PostLikeTable.userId] = userId
                 it[PostLikeTable.postId] = postId
             }
@@ -295,7 +295,7 @@ class PostRepositoryImpl(
         if (alreadyBookmarked) {
             PostBookmarkTable.deleteWhere { (PostBookmarkTable.userId eq userId) and (PostBookmarkTable.postId eq postId) }
         } else {
-            PostBookmarkTable.insert {
+            PostBookmarkTable.insertIgnore {
                 it[PostBookmarkTable.userId] = userId
                 it[PostBookmarkTable.postId] = postId
             }

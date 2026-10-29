@@ -8,10 +8,10 @@ import io.ktor.server.routing.*
 fun Application.checkUpdateRoute() {
     routing {
         get("/") {
-            call.respond(
-                HttpStatusCode.OK,
-                "Welcome RANJAN"
-            )
+            call.respondText("Welcome RANJAN", ContentType.Text.Plain, HttpStatusCode.OK)
+        }
+        get("/health") {
+            call.respondText("OK", ContentType.Text.Plain, HttpStatusCode.OK)
         }
         get("/checkUpdate") {
             call.respond(

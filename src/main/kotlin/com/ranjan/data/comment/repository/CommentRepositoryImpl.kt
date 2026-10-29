@@ -154,7 +154,7 @@ class CommentRepositoryImpl(
         if (alreadyLiked) {
             CommentLikeTable.deleteWhere { (CommentLikeTable.userId eq userId) and (CommentLikeTable.commentId eq commentId) }
         } else {
-            CommentLikeTable.insert {
+            CommentLikeTable.insertIgnore {
                 it[CommentLikeTable.userId] = userId
                 it[CommentLikeTable.commentId] = commentId
             }
