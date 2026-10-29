@@ -7,8 +7,11 @@ import io.ktor.server.routing.*
 
 fun Application.checkUpdateRoute() {
     routing {
-        get("/health") {
+        get("/") {
             call.respondText("Welcome RANJAN", ContentType.Text.Plain, HttpStatusCode.OK)
+        }
+        get("/health") {
+            call.respondText("OK", ContentType.Text.Plain, HttpStatusCode.OK)
         }
         get("/checkUpdate") {
             call.respond(
