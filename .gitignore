@@ -39,4 +39,5 @@ out/
 uploads
 .DS_Store
 .env
-.env.local
+.env.*
+!.env.example

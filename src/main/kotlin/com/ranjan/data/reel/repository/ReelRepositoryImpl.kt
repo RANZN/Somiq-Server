@@ -159,7 +159,7 @@ class ReelRepositoryImpl(
         if (alreadyLiked) {
             ReelLikeTable.deleteWhere { (ReelLikeTable.userId eq userId) and (ReelLikeTable.reelId eq reelId) }
         } else {
-            ReelLikeTable.insert {
+            ReelLikeTable.insertIgnore {
                 it[ReelLikeTable.userId] = userId
                 it[ReelLikeTable.reelId] = reelId
             }
@@ -176,7 +176,7 @@ class ReelRepositoryImpl(
         if (alreadyBookmarked) {
             ReelBookmarkTable.deleteWhere { (ReelBookmarkTable.userId eq userId) and (ReelBookmarkTable.reelId eq reelId) }
         } else {
-            ReelBookmarkTable.insert {
+            ReelBookmarkTable.insertIgnore {
                 it[ReelBookmarkTable.userId] = userId
                 it[ReelBookmarkTable.reelId] = reelId
             }

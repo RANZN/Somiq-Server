@@ -55,7 +55,7 @@ class AccountRepositoryImpl(
             }
             false
         } else {
-            FollowTable.insert {
+            FollowTable.insertIgnore {
                 it[FollowTable.followerId] = followerId
                 it[FollowTable.followingId] = followingId
             }
