@@ -63,15 +63,7 @@ class Env(private val raw: Map<String, String>) {
 
         private fun loadEnvironment(): Map<String, String> {
             val systemProps = System.getProperties().entries.associate { it.key.toString() to it.value.toString() }
-            val dotEnv = loadDotEnv()
-            val appEnv = System.getenv("APP_ENV") ?: System.getProperty("APP_ENV") ?: dotEnv["APP_ENV"]
-            return loadJsonConfig(appEnv) + dotEnv + systemProps + System.getenv()
-        }
-
-        private fun loadJsonConfig(appEnv: String?): Map<String, String> {
-            val base = readJsonResource("config.json")
-            val envSpecific = appEnv?.let { readJsonResource("config.${it.trim().lowercase()}.json") }.orEmpty()
-            return base + envSpecific
+            return readJsonResource("config.json") + loadDotEnv() + systemProps + System.getenv()
         }
 
         private fun readJsonResource(name: String): Map<String, String> =

@@ -25,14 +25,17 @@ val storageModule = module {
 
     single<MediaStorageService> {
         when (val config = get<StorageConfig>()) {
-            is StorageConfig.Stratus -> StratusMediaStorageService(
-                bucketUrl = config.bucketUrl,
-                httpClient = get(StorageHttpClient),
-                tokenProvider = ZohoTokenProvider(get(), config.oauth),
-                urlResolver = StratusStorageUrlResolver(config.bucketUrl),
-                mimeTypeResolver = get(),
-                fileFormatDetector = get()
-            )
+            is StorageConfig.Stratus -> {
+                val httpClient = get<HttpClient>(StorageHttpClient)
+                StratusMediaStorageService(
+                    bucketUrl = config.bucketUrl,
+                    httpClient = httpClient,
+                    tokenProvider = ZohoTokenProvider(httpClient, config.oauth),
+                    urlResolver = StratusStorageUrlResolver(config.bucketUrl),
+                    mimeTypeResolver = get(),
+                    fileFormatDetector = get()
+                )
+            }
 
             is StorageConfig.Gcs -> GcsMediaStorageService(
                 bucketName = config.bucket,
