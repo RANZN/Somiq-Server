@@ -1,6 +1,5 @@
 {
-  "command": "sh -c 'PORT=$X_ZOHO_CATALYST_LISTEN_PORT java -jar app-all.jar'",
-  "buildPath": "PLACEHOLDER",
-  "stack": "java21",
+  "command": "java -jar app.jar",
+  "stack": "java25",
   "env_variables": {}
 }
