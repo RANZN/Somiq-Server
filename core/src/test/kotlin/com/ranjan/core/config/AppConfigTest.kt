@@ -31,14 +31,50 @@ class AppConfigTest {
 
     @Test
     fun `test StorageProvider enum values`() {
-        assertEquals(listOf(StorageProvider.LOCAL, StorageProvider.GCS), StorageProvider.entries)
+        assertEquals(listOf(StorageProvider.LOCAL, StorageProvider.GCS, StorageProvider.STRATUS), StorageProvider.entries)
     }
 
     @Test
-    fun `test StorageConfig from loads from Env`() {
-        val storage = StorageConfig.from(Env.load())
-        assertEquals(StorageProvider.LOCAL, storage.provider)
-        assertEquals("somiq-uploads", storage.gcsBucket)
+    fun `test StorageConfig from returns Local by default`() {
+        assertEquals(StorageConfig.Local, StorageConfig.from(Env.from(emptyMap())))
+    }
+
+    @Test
+    fun `test StorageConfig from returns Stratus with OAuth settings`() {
+        val storage = kotlin.test.assertIs<StorageConfig.Stratus>(
+            StorageConfig.from(
+                Env.from(
+                    mapOf(
+                        "STORAGE_PROVIDER" to "STRATUS",
+                        "STRATUS_BUCKET_URL" to "https://somiq-uploads-development.zohostratus.in",
+                        "ZOHO_CLIENT_ID" to "client-id",
+                        "ZOHO_CLIENT_SECRET" to "client-secret",
+                        "ZOHO_REFRESH_TOKEN" to "refresh-token"
+                    )
+                )
+            )
+        )
+        assertEquals("https://somiq-uploads-development.zohostratus.in", storage.bucketUrl)
+        assertEquals("https://accounts.zoho.in", storage.oauth.accountsUrl)
+    }
+
+    @Test
+    fun `test StorageConfig from requires Stratus credentials only when Stratus is selected`() {
+        val ex = kotlin.test.assertFailsWith<IllegalStateException> {
+            StorageConfig.from(Env.from(mapOf("STORAGE_PROVIDER" to "STRATUS")))
+        }
+        assertTrue(ex.message!!.contains("STRATUS_BUCKET_URL"))
+        assertTrue(ex.message!!.contains("ZOHO_REFRESH_TOKEN"))
+    }
+
+    @Test
+    fun `test StorageConfig from returns Gcs with default public URL`() {
+        val storage = kotlin.test.assertIs<StorageConfig.Gcs>(
+            StorageConfig.from(
+                Env.from(mapOf("STORAGE_PROVIDER" to "GCS", "GCS_BUCKET_NAME" to "somiq-uploads"))
+            )
+        )
+        assertEquals("https://storage.googleapis.com/somiq-uploads", storage.publicUrlPrefix)
     }
 
     @Test
@@ -78,7 +114,7 @@ class AppConfigTest {
             val env = Env.from(emptyMap())
             AppConfig.from(env)
         }
-        assertTrue(ex.message!!.contains("Missing or invalid required environment variables"))
+        assertTrue(ex.message!!.contains("Missing or invalid required configuration"))
         assertTrue(ex.message!!.contains("JWT_SECRET"))
         assertTrue(ex.message!!.contains("DB_DRIVER"))
         assertTrue(ex.message!!.contains("JWT_ACCESS_TOKEN_LIFETIME"))
