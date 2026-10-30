@@ -29,5 +29,7 @@ dependencies {
     api(libs.google.cloud.storage)
 
     testImplementation(libs.kotlin.test.junit)
+    api(libs.ktor.client.core)
+    api(libs.ktor.client.cio)
 }
 

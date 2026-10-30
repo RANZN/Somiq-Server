@@ -8,19 +8,19 @@ import java.io.FileInputStream
 
 object GcsClientFactory {
 
-    fun create(config: StorageConfig): Storage {
+    fun create(config: StorageConfig.Gcs): Storage {
         val optionsBuilder = StorageOptions.newBuilder()
 
-        if (!config.gcsProjectId.isNullOrBlank()) {
-            optionsBuilder.setProjectId(config.gcsProjectId)
+        if (!config.projectId.isNullOrBlank()) {
+            optionsBuilder.setProjectId(config.projectId)
         }
 
         val credentials = when {
-            !config.gcsCredentialsJson.isNullOrBlank() ->
-                GoogleCredentials.fromStream(config.gcsCredentialsJson.byteInputStream())
+            !config.credentialsJson.isNullOrBlank() ->
+                GoogleCredentials.fromStream(config.credentialsJson.byteInputStream())
 
-            !config.gcsCredentialsPath.isNullOrBlank() ->
-                FileInputStream(config.gcsCredentialsPath).use { stream ->
+            !config.credentialsPath.isNullOrBlank() ->
+                FileInputStream(config.credentialsPath).use { stream ->
                     GoogleCredentials.fromStream(stream)
                 }
 
