@@ -51,6 +51,7 @@ jobs:
       - name: Deploy to Zoho Catalyst AppSail
         env:
           CATALYST_TOKEN: ${{ secrets.CATALYST_TOKEN }}
+          CATALYST_ORG: ${{ secrets.CATALYST_ORG }}
           CATALYST_PROJECT: ${{ secrets.CATALYST_PROJECT }}
           CATALYST_DC: ${{ secrets.CATALYST_DC }}
         run: |
@@ -63,6 +64,7 @@ jobs:
             --name somiq-server \
             --source docker://somiq-server:latest \
             --port 8080 \
+            --org "$CATALYST_ORG" \
             --project "$CATALYST_PROJECT" \
             --token "$CATALYST_TOKEN" \
             $DC_ARG
