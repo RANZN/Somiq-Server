@@ -1,6 +1,7 @@
 package com.ranjan
 
 import com.ranjan.core.config.AppConfig
+import com.ranjan.core.di.configModule
 import com.ranjan.core.di.coreModule
 import com.ranjan.core.plugin.configureCORS
 import com.ranjan.core.plugin.configureExceptionHandling
@@ -23,8 +24,8 @@ fun main(args: Array<String>) {
 
 @Suppress("unused")
 fun Application.module() {
-    configureKoin()
-    val config: AppConfig by inject()
+    val config = AppConfig.from(environment.config)
+    configureKoin(config)
     configureDatabase()
     configureSerialization()
     configureSecurity(config.jwt)
@@ -33,10 +34,10 @@ fun Application.module() {
     configureCORS(config.cors)
 }
 
-fun Application.configureKoin() {
+fun Application.configureKoin(config: AppConfig) {
     install(Koin) {
         printLogger()
-        modules(coreModule, dataModule, domainModule, appModule)
+        modules(configModule(config), coreModule, dataModule, domainModule, appModule)
     }
 }
 

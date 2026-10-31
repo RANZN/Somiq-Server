@@ -1,13 +1,48 @@
 package com.ranjan.core.config
 
-import com.ranjan.core.db.DatabaseConfig
+import com.ranjan.core.di.configModule
+import com.ranjan.core.di.coreModule
+import com.ranjan.core.storage.MediaStorageService
 import com.ranjan.core.storage.StorageProvider
+import io.ktor.server.config.MapApplicationConfig
+import org.jetbrains.exposed.sql.Database
+import org.koin.dsl.koinApplication
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
+import kotlin.test.assertIs
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class AppConfigTest {
+
+    private fun testConfig(vararg overrides: Pair<String, String>): MapApplicationConfig {
+        val values = linkedMapOf(
+            "app.env" to "LOCAL",
+            "cors.allowedHosts" to "localhost, 127.0.0.1",
+            "jwt.secret" to "test-secret-key-that-is-at-least-32-characters",
+            "jwt.issuer" to "somiq-server",
+            "jwt.audience" to "somiq-app",
+            "jwt.signupAudience" to "somiq-signup",
+            "jwt.accessTokenLifetime" to "1h",
+            "jwt.refreshTokenLifetime" to "7d",
+            "jwt.signupTokenLifetime" to "30m",
+            "database.url" to "jdbc:h2:mem:appconfig;DB_CLOSE_DELAY=-1",
+            "database.user" to "sa",
+            "storage.provider" to "LOCAL"
+        )
+        values.putAll(overrides)
+        return MapApplicationConfig(*values.toList().toTypedArray())
+    }
+
+    private val stratusValues = arrayOf(
+        "storage.provider" to "STRATUS",
+        "storage.stratus.bucketUrl" to "https://somiq-uploads-development.zohostratus.in",
+        "storage.stratus.oauth.clientId" to "client-id",
+        "storage.stratus.oauth.clientSecret" to "client-secret",
+        "storage.stratus.oauth.refreshToken" to "refresh-token"
+    )
 
     @Test
     fun `test AppEnv enum values and flags`() {
@@ -17,107 +52,97 @@ class AppConfigTest {
     }
 
     @Test
-    fun `test CorsConfig initialization`() {
-        val prodCors = CorsConfig(
-            env = AppEnv.PRODUCTION,
-            allowedHosts = listOf("example.com", "api.example.com")
-        )
-        assertEquals(AppEnv.PRODUCTION, prodCors.env)
-        assertEquals(2, prodCors.allowedHosts.size)
-
-        val localCors = CorsConfig(env = AppEnv.LOCAL)
-        assertEquals(emptyList(), localCors.allowedHosts)
-    }
-
-    @Test
     fun `test StorageProvider enum values`() {
         assertEquals(listOf(StorageProvider.LOCAL, StorageProvider.GCS, StorageProvider.STRATUS), StorageProvider.entries)
     }
 
     @Test
-    fun `test StorageConfig from returns Local by default`() {
-        assertEquals(StorageConfig.Local, StorageConfig.from(Env.from(emptyMap())))
+    fun `test AppConfig from aggregates all sections`() {
+        val appConfig = AppConfig.from(testConfig())
+        assertEquals(AppEnv.LOCAL, appConfig.env)
+        assertEquals(StorageConfig.Local, appConfig.storage)
+        assertEquals("org.h2.Driver", appConfig.database.driver)
+        assertEquals("somiq-server", appConfig.jwt.issuer)
     }
 
     @Test
-    fun `test StorageConfig from returns Stratus with OAuth settings`() {
-        val storage = kotlin.test.assertIs<StorageConfig.Stratus>(
-            StorageConfig.from(
-                Env.from(
-                    mapOf(
-                        "STORAGE_PROVIDER" to "STRATUS",
-                        "STRATUS_BUCKET_URL" to "https://somiq-uploads-development.zohostratus.in",
-                        "ZOHO_CLIENT_ID" to "client-id",
-                        "ZOHO_CLIENT_SECRET" to "client-secret",
-                        "ZOHO_REFRESH_TOKEN" to "refresh-token"
-                    )
-                )
-            )
-        )
+    fun `test AppConfig from reads app env case-insensitively`() {
+        assertEquals(AppEnv.PRODUCTION, AppConfig.from(testConfig("app.env" to "production")).env)
+    }
+
+    @Test
+    fun `test AppConfig from rejects invalid app env`() {
+        val ex = assertFailsWith<IllegalArgumentException> {
+            AppConfig.from(testConfig("app.env" to "STAGING"))
+        }
+        assertTrue(ex.message!!.contains("app.env"))
+    }
+
+    @Test
+    fun `test CorsConfig splits comma separated hosts and takes env from app section`() {
+        val cors = AppConfig.from(testConfig("app.env" to "PRODUCTION")).cors
+        assertEquals(AppEnv.PRODUCTION, cors.env)
+        assertEquals(listOf("localhost", "127.0.0.1"), cors.allowedHosts)
+    }
+
+    @Test
+    fun `test CorsConfig defaults`() {
+        val cors = CorsConfig()
+        assertEquals(AppEnv.LOCAL, cors.env)
+        assertEquals(emptyList(), cors.allowedHosts)
+    }
+
+    @Test
+    fun `test storage defaults to Stratus when provider is not set`() {
+        val config = testConfig(*stratusValues)
+        config.put("storage.provider", "")
+        assertIs<StorageConfig.Stratus>(AppConfig.from(config).storage)
+    }
+
+    @Test
+    fun `test storage reads Stratus with OAuth settings`() {
+        val storage = assertIs<StorageConfig.Stratus>(AppConfig.from(testConfig(*stratusValues)).storage)
         assertEquals("https://somiq-uploads-development.zohostratus.in", storage.bucketUrl)
+        assertEquals("client-id", storage.oauth.clientId)
         assertEquals("https://accounts.zoho.in", storage.oauth.accountsUrl)
     }
 
     @Test
-    fun `test StorageConfig from requires Stratus credentials only when Stratus is selected`() {
-        val ex = kotlin.test.assertFailsWith<IllegalStateException> {
-            StorageConfig.from(Env.from(mapOf("STORAGE_PROVIDER" to "STRATUS")))
+    fun `test storage rejects blank Stratus settings`() {
+        val ex = assertFailsWith<IllegalArgumentException> {
+            AppConfig.from(testConfig(*stratusValues, "storage.stratus.bucketUrl" to ""))
         }
         assertTrue(ex.message!!.contains("STRATUS_BUCKET_URL"))
-        assertTrue(ex.message!!.contains("ZOHO_REFRESH_TOKEN"))
     }
 
     @Test
-    fun `test StorageConfig from returns Gcs with default public URL`() {
-        val storage = kotlin.test.assertIs<StorageConfig.Gcs>(
-            StorageConfig.from(
-                Env.from(mapOf("STORAGE_PROVIDER" to "GCS", "GCS_BUCKET_NAME" to "somiq-uploads"))
-            )
+    fun `test storage reads Gcs with default public URL`() {
+        val storage = assertIs<StorageConfig.Gcs>(
+            AppConfig.from(
+                testConfig("storage.provider" to "GCS", "storage.gcs.bucket" to "somiq-uploads")
+            ).storage
         )
-        assertEquals("https://storage.googleapis.com/somiq-uploads", storage.publicUrlPrefix)
+        assertEquals("https://storage.googleapis.com/somiq-uploads", storage.resolvedPublicUrlPrefix)
     }
 
     @Test
-    fun `test AppConfig from aggregates all subconfigs`() {
-        val env = Env.load()
-        val appConfig = AppConfig.from(env)
-        assertEquals(AppEnv.LOCAL, appConfig.env)
-        assertEquals(StorageConfig.from(env), appConfig.storage)
-        assertEquals(DatabaseConfig.from(env), appConfig.database)
-        assertEquals(JwtConfig.from(env), appConfig.jwt)
+    fun `test AppConfig from rejects blank JWT secret`() {
+        val ex = assertFailsWith<IllegalArgumentException> {
+            AppConfig.from(testConfig("jwt.secret" to ""))
+        }
+        assertTrue(ex.message!!.contains("JWT_SECRET"))
     }
 
     @Test
     fun `test koin resolution of AppConfig, StorageConfig, and MediaStorageService`() {
-        val koinApp = org.koin.dsl.koinApplication {
-            modules(com.ranjan.core.di.coreModule)
+        val koinApp = koinApplication {
+            modules(configModule(AppConfig.from(testConfig())), coreModule)
         }
         val appConfig = koinApp.koin.get<AppConfig>()
-        val storageConfig = koinApp.koin.get<StorageConfig>()
-        val dbConfig = koinApp.koin.get<DatabaseConfig>()
-        val jwtConfig = koinApp.koin.get<JwtConfig>()
 
-        assertEquals(appConfig.storage, storageConfig)
-        assertEquals(appConfig.database, dbConfig)
-        assertEquals(appConfig.jwt, jwtConfig)
-
-        val mediaStorage = koinApp.koin.get<com.ranjan.core.storage.MediaStorageService>()
-        kotlin.test.assertNotNull(mediaStorage)
-
-        val database = koinApp.koin.get<org.jetbrains.exposed.sql.Database>()
-        kotlin.test.assertNotNull(database)
-    }
-
-    @Test
-    fun `test Env validation throws exception when required variable is missing`() {
-        val ex = kotlin.test.assertFailsWith<IllegalStateException> {
-            val env = Env.from(emptyMap())
-            AppConfig.from(env)
-        }
-        assertTrue(ex.message!!.contains("Missing or invalid required configuration"))
-        assertTrue(ex.message!!.contains("JWT_SECRET"))
-        assertTrue(ex.message!!.contains("DB_DRIVER"))
-        assertTrue(ex.message!!.contains("JWT_ACCESS_TOKEN_LIFETIME"))
+        assertEquals(appConfig.storage, koinApp.koin.get<StorageConfig>())
+        assertEquals(appConfig.jwt, koinApp.koin.get<JwtConfig>())
+        assertNotNull(koinApp.koin.get<MediaStorageService>())
+        assertNotNull(koinApp.koin.get<Database>())
     }
 }
-

@@ -1,7 +1,7 @@
 package com.ranjan.core.di
 
 import com.ranjan.core.config.AppConfig
-import com.ranjan.core.db.DatabaseConfig
+import com.ranjan.core.config.DatabaseConfig
 import com.ranjan.core.db.DatabaseFactory
 import org.jetbrains.exposed.sql.Database
 import org.koin.dsl.module

@@ -1,18 +1,14 @@
 package com.ranjan.core.config
 
+import com.ranjan.core.config.serializer.CommaSeparatedListSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+
+/** CORS settings, read from the `cors` section of application.yaml. [env] is filled in from `app.env`. */
+@Serializable
 data class CorsConfig(
-    val env: AppEnv,
+    @Transient
+    val env: AppEnv = AppEnv.LOCAL,
+    @Serializable(with = CommaSeparatedListSerializer::class)
     val allowedHosts: List<String> = emptyList()
-) {
-    companion object {
-        fun from(env: Env): CorsConfig {
-            val appEnv = env.enum("APP_ENV", AppEnv.LOCAL)
-            val allowedHosts = env.list("ALLOWED_CORS_HOSTS")
-            env.validate()
-            return CorsConfig(
-                env = appEnv,
-                allowedHosts = allowedHosts
-            )
-        }
-    }
-}
+)
