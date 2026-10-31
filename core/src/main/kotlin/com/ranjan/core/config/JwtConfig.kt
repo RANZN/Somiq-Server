@@ -3,6 +3,7 @@ package com.ranjan.core.config
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
+import io.ktor.server.config.ApplicationConfig
 import kotlin.time.Duration
 
 data class JwtConfig(
@@ -44,20 +45,19 @@ data class JwtConfig(
     val signupTokenLifetimeMs: Long = signupTokenLifetime.inWholeMilliseconds
 
     companion object {
-        val NAME: String by lazy { Env.load().require("JWT_AUTH_NAME") }
+        /** Name of the Ktor authentication provider, used by `authenticate(JwtConfig.NAME)`. */
+        const val NAME = "auth-jwt"
 
-        fun from(env: Env): JwtConfig {
-            val secret = env.require("JWT_SECRET")
-            val issuer = env.require("JWT_ISSUER")
-            val audience = env.require("JWT_AUDIENCE")
-            val signupAudience = env.require("JWT_SIGNUP_AUDIENCE")
-            val realm = env.require("JWT_AUTH_NAME")
-            val accessLifetime = env.duration("JWT_ACCESS_TOKEN_LIFETIME")
-            val refreshLifetime = env.duration("JWT_REFRESH_TOKEN_LIFETIME")
-            val signupLifetime = env.duration("JWT_SIGNUP_TOKEN_LIFETIME")
-            env.validate()
-            return JwtConfig(secret, issuer, audience, signupAudience, realm, accessLifetime, refreshLifetime, signupLifetime)
-        }
+        fun from(config: ApplicationConfig): JwtConfig = JwtConfig(
+            secret = config.requireString("jwt.secret"),
+            issuer = config.requireString("jwt.issuer"),
+            audience = config.requireString("jwt.audience"),
+            signupAudience = config.requireString("jwt.signupAudience"),
+            realm = config.requireString("jwt.realm"),
+            accessTokenLifetime = config.requireDuration("jwt.accessTokenLifetime"),
+            refreshTokenLifetime = config.requireDuration("jwt.refreshTokenLifetime"),
+            signupTokenLifetime = config.requireDuration("jwt.signupTokenLifetime")
+        )
     }
 
     object Claims {

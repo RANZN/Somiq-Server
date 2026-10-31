@@ -1,16 +1,19 @@
 package com.ranjan.core.config
 
+import io.ktor.server.config.ApplicationConfig
+
 data class CorsConfig(
     val env: AppEnv,
     val allowedHosts: List<String> = emptyList()
 ) {
     companion object {
-        fun from(env: Env): CorsConfig {
-            val appEnv = env.enum("APP_ENV", AppEnv.LOCAL)
-            val allowedHosts = env.list("ALLOWED_CORS_HOSTS")
-            env.validate()
+        fun from(config: ApplicationConfig, env: AppEnv): CorsConfig {
+            val allowedHosts = config.requireString("app.corsHosts")
+                .split(",")
+                .map { it.trim() }
+                .filter { it.isNotEmpty() }
             return CorsConfig(
-                env = appEnv,
+                env = env,
                 allowedHosts = allowedHosts
             )
         }

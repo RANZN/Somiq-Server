@@ -1,6 +1,7 @@
 package com.ranjan.core.config
 
 import com.ranjan.core.storage.StorageProvider
+import io.ktor.server.config.ApplicationConfig
 
 sealed interface StorageConfig {
 
@@ -27,34 +28,34 @@ sealed interface StorageConfig {
     )
 
     companion object {
-        fun from(env: Env): StorageConfig {
-            val config = when (env.enum("STORAGE_PROVIDER", StorageProvider.LOCAL)) {
-                StorageProvider.STRATUS -> stratus(env)
-                StorageProvider.GCS -> gcs(env)
+        private const val DEFAULT_ZOHO_ACCOUNTS_URL = "https://accounts.zoho.in"
+
+        fun from(config: ApplicationConfig): StorageConfig =
+            when (config.enum("storage.provider", StorageProvider.STRATUS)) {
+                StorageProvider.STRATUS -> stratus(config)
+                StorageProvider.GCS -> gcs(config)
                 StorageProvider.LOCAL -> Local
             }
-            env.validate()
-            return config
-        }
 
-        private fun gcs(env: Env): Gcs {
-            val bucket = env.require("GCS_BUCKET_NAME")
+        private fun gcs(config: ApplicationConfig): Gcs {
+            val bucket = config.requireString("storage.gcs.bucket")
             return Gcs(
                 bucket = bucket,
-                publicUrlPrefix = env.optional("GCS_PUBLIC_URL_PREFIX") ?: "https://storage.googleapis.com/$bucket",
-                projectId = env.optional("GCS_PROJECT_ID"),
-                credentialsPath = env.optional("GCS_CREDENTIALS_PATH") ?: env.optional("GOOGLE_APPLICATION_CREDENTIALS"),
-                credentialsJson = env.optional("GCS_CREDENTIALS_JSON")
+                publicUrlPrefix = config.optionalString("storage.gcs.publicUrlPrefix")
+                    ?: "https://storage.googleapis.com/$bucket",
+                projectId = config.optionalString("storage.gcs.projectId"),
+                credentialsPath = config.optionalString("storage.gcs.credentialsPath"),
+                credentialsJson = config.optionalString("storage.gcs.credentialsJson")
             )
         }
 
-        private fun stratus(env: Env): Stratus = Stratus(
-            bucketUrl = env.require("STRATUS_BUCKET_URL"),
+        private fun stratus(config: ApplicationConfig): Stratus = Stratus(
+            bucketUrl = config.requireString("storage.stratus.bucketUrl"),
             oauth = ZohoOAuth(
-                accountsUrl = env.optional("ZOHO_ACCOUNTS_URL") ?: "https://accounts.zoho.in",
-                clientId = env.require("ZOHO_CLIENT_ID"),
-                clientSecret = env.require("ZOHO_CLIENT_SECRET"),
-                refreshToken = env.require("ZOHO_REFRESH_TOKEN")
+                accountsUrl = config.optionalString("storage.stratus.accountsUrl") ?: DEFAULT_ZOHO_ACCOUNTS_URL,
+                clientId = config.requireString("storage.stratus.clientId"),
+                clientSecret = config.requireString("storage.stratus.clientSecret"),
+                refreshToken = config.requireString("storage.stratus.refreshToken")
             )
         )
     }

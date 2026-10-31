@@ -7,7 +7,8 @@ import io.ktor.server.auth.jwt.*
 
 fun Application.configureSecurity(config: JwtConfig) {
     install(Authentication) {
-        jwt(config.realm) {
+        jwt(JwtConfig.NAME) {
+            realm = config.realm
             verifier(config.verifier)
             validate { credential ->
                 val userId = credential.payload.getClaim(JwtConfig.Claims.USER_ID).asString()
