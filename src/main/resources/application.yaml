@@ -15,7 +15,6 @@ jwt:
     issuer: "somiq-server"
     audience: "somiq-app"
     signupAudience: "somiq-signup"
-    realm: "auth-jwt"
     accessTokenLifetime: "1h"
     refreshTokenLifetime: "7d"
     signupTokenLifetime: "30m"

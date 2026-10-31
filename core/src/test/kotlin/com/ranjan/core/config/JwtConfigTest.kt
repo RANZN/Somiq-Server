@@ -37,7 +37,6 @@ class JwtConfigTest {
             accessTokenLifetime = 2.hours,
             refreshTokenLifetime = 14.days,
             signupTokenLifetime = 15.minutes,
-            realm = "custom-realm"
         )
 
         assertEquals("my-super-secret-key-for-testing", config.secret)
@@ -47,7 +46,6 @@ class JwtConfigTest {
         assertEquals(2.hours, config.accessTokenLifetime)
         assertEquals(14.days, config.refreshTokenLifetime)
         assertEquals(15.minutes, config.signupTokenLifetime)
-        assertEquals("custom-realm", config.realm)
 
         assertNotNull(config.algorithm)
         assertNotNull(config.verifier)
@@ -67,7 +65,6 @@ class JwtConfigTest {
                 issuer = "custom-issuer",
                 audience = "custom-audience",
                 signupAudience = "custom-signup",
-                realm = "custom-realm",
                 accessTokenLifetime = 1.hours,
                 refreshTokenLifetime = 7.days,
                 signupTokenLifetime = 30.minutes
@@ -79,7 +76,6 @@ class JwtConfigTest {
                 issuer = "custom-issuer",
                 audience = "custom-audience",
                 signupAudience = "custom-signup",
-                realm = "custom-realm",
                 accessTokenLifetime = 1.hours,
                 refreshTokenLifetime = 7.days,
                 signupTokenLifetime = 30.minutes
@@ -94,7 +90,6 @@ class JwtConfigTest {
         assertEquals("somiq-server", config.issuer)
         assertEquals("somiq-app", config.audience)
         assertEquals("somiq-signup", config.signupAudience)
-        assertEquals("auth-jwt", config.realm)
         assertEquals(1.hours, config.accessTokenLifetime)
         assertEquals(7.days, config.refreshTokenLifetime)
         assertEquals(30.minutes, config.signupTokenLifetime)

@@ -11,7 +11,6 @@ data class JwtConfig(
     val issuer: String,
     val audience: String,
     val signupAudience: String,
-    val realm: String,
     val accessTokenLifetime: Duration,
     val refreshTokenLifetime: Duration,
     val signupTokenLifetime: Duration
@@ -21,7 +20,6 @@ data class JwtConfig(
         require(issuer.isNotBlank()) { "JWT issuer must not be blank" }
         require(audience.isNotBlank()) { "JWT audience must not be blank" }
         require(signupAudience.isNotBlank()) { "JWT signupAudience must not be blank" }
-        require(realm.isNotBlank()) { "JWT realm must not be blank" }
         require(accessTokenLifetime.isPositive()) { "JWT accessTokenLifetime must be positive" }
         require(refreshTokenLifetime.isPositive()) { "JWT refreshTokenLifetime must be positive" }
         require(signupTokenLifetime.isPositive()) { "JWT signupTokenLifetime must be positive" }
@@ -53,7 +51,6 @@ data class JwtConfig(
             issuer = config.requireString("jwt.issuer"),
             audience = config.requireString("jwt.audience"),
             signupAudience = config.requireString("jwt.signupAudience"),
-            realm = config.requireString("jwt.realm"),
             accessTokenLifetime = config.requireDuration("jwt.accessTokenLifetime"),
             refreshTokenLifetime = config.requireDuration("jwt.refreshTokenLifetime"),
             signupTokenLifetime = config.requireDuration("jwt.signupTokenLifetime")
