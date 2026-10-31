@@ -1,62 +1,51 @@
 package com.ranjan.core.config
 
-import com.ranjan.core.storage.StorageProvider
-import io.ktor.server.config.ApplicationConfig
+import kotlinx.serialization.Serializable
 
+/** Media storage settings, read from the `storage` section of application.yaml. */
 sealed interface StorageConfig {
 
     data object Local : StorageConfig
 
+    @Serializable
     data class Gcs(
         val bucket: String,
-        val publicUrlPrefix: String,
+        val publicUrlPrefix: String = "",
         val projectId: String? = null,
         val credentialsPath: String? = null,
         val credentialsJson: String? = null
-    ) : StorageConfig
+    ) : StorageConfig {
+        init {
+            require(bucket.isNotBlank()) { "GCS bucket must not be blank (set GCS_BUCKET_NAME)" }
+        }
 
+        /** Public URL prefix for stored files, defaulting to the bucket's googleapis.com URL. */
+        val resolvedPublicUrlPrefix: String
+            get() = publicUrlPrefix.ifBlank { "https://storage.googleapis.com/$bucket" }
+    }
+
+    @Serializable
     data class Stratus(
         val bucketUrl: String,
         val oauth: ZohoOAuth
-    ) : StorageConfig
+    ) : StorageConfig {
+        init {
+            require(bucketUrl.isNotBlank()) { "Stratus bucketUrl must not be blank (set STRATUS_BUCKET_URL)" }
+        }
+    }
 
+    @Serializable
     data class ZohoOAuth(
-        val accountsUrl: String,
+        val accountsUrl: String = "https://accounts.zoho.in",
         val clientId: String,
         val clientSecret: String,
         val refreshToken: String
-    )
-
-    companion object {
-        private const val DEFAULT_ZOHO_ACCOUNTS_URL = "https://accounts.zoho.in"
-
-        fun from(config: ApplicationConfig): StorageConfig =
-            when (config.enum("storage.provider", StorageProvider.STRATUS)) {
-                StorageProvider.STRATUS -> stratus(config)
-                StorageProvider.GCS -> gcs(config)
-                StorageProvider.LOCAL -> Local
-            }
-
-        private fun gcs(config: ApplicationConfig): Gcs {
-            val bucket = config.requireString("storage.gcs.bucket")
-            return Gcs(
-                bucket = bucket,
-                publicUrlPrefix = config.optionalString("storage.gcs.publicUrlPrefix")
-                    ?: "https://storage.googleapis.com/$bucket",
-                projectId = config.optionalString("storage.gcs.projectId"),
-                credentialsPath = config.optionalString("storage.gcs.credentialsPath"),
-                credentialsJson = config.optionalString("storage.gcs.credentialsJson")
-            )
+    ) {
+        init {
+            require(accountsUrl.isNotBlank()) { "Zoho accountsUrl must not be blank" }
+            require(clientId.isNotBlank()) { "Zoho clientId must not be blank (set ZOHO_CLIENT_ID)" }
+            require(clientSecret.isNotBlank()) { "Zoho clientSecret must not be blank (set ZOHO_CLIENT_SECRET)" }
+            require(refreshToken.isNotBlank()) { "Zoho refreshToken must not be blank (set ZOHO_REFRESH_TOKEN)" }
         }
-
-        private fun stratus(config: ApplicationConfig): Stratus = Stratus(
-            bucketUrl = config.requireString("storage.stratus.bucketUrl"),
-            oauth = ZohoOAuth(
-                accountsUrl = config.optionalString("storage.stratus.accountsUrl") ?: DEFAULT_ZOHO_ACCOUNTS_URL,
-                clientId = config.requireString("storage.stratus.clientId"),
-                clientSecret = config.requireString("storage.stratus.clientSecret"),
-                refreshToken = config.requireString("storage.stratus.refreshToken")
-            )
-        )
     }
 }

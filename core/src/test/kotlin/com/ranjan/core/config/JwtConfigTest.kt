@@ -1,6 +1,7 @@
 package com.ranjan.core.config
 
 import io.ktor.server.config.MapApplicationConfig
+import io.ktor.server.config.getAs
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -12,19 +13,18 @@ import kotlin.time.Duration.Companion.minutes
 
 class JwtConfigTest {
 
-    private fun jwtConfig(vararg overrides: Pair<String, String>): MapApplicationConfig {
+    private fun decode(vararg overrides: Pair<String, String>): JwtConfig {
         val values = linkedMapOf(
             "jwt.secret" to "local-development-secret-key-minimum-32-bytes-long!",
             "jwt.issuer" to "somiq-server",
             "jwt.audience" to "somiq-app",
             "jwt.signupAudience" to "somiq-signup",
-            "jwt.realm" to "auth-jwt",
             "jwt.accessTokenLifetime" to "1h",
             "jwt.refreshTokenLifetime" to "7d",
             "jwt.signupTokenLifetime" to "30m"
         )
         values.putAll(overrides)
-        return MapApplicationConfig(*values.toList().toTypedArray())
+        return MapApplicationConfig(*values.toList().toTypedArray()).property("jwt").getAs()
     }
 
     @Test
@@ -36,7 +36,7 @@ class JwtConfigTest {
             signupAudience = "custom-signup-audience",
             accessTokenLifetime = 2.hours,
             refreshTokenLifetime = 14.days,
-            signupTokenLifetime = 15.minutes,
+            signupTokenLifetime = 15.minutes
         )
 
         assertEquals("my-super-secret-key-for-testing", config.secret)
@@ -61,17 +61,6 @@ class JwtConfigTest {
     fun `test JwtConfig throws exception when secret is blank`() {
         assertFailsWith<IllegalArgumentException> {
             JwtConfig(
-                secret = "",
-                issuer = "custom-issuer",
-                audience = "custom-audience",
-                signupAudience = "custom-signup",
-                accessTokenLifetime = 1.hours,
-                refreshTokenLifetime = 7.days,
-                signupTokenLifetime = 30.minutes
-            )
-        }
-        assertFailsWith<IllegalArgumentException> {
-            JwtConfig(
                 secret = "   ",
                 issuer = "custom-issuer",
                 audience = "custom-audience",
@@ -84,8 +73,8 @@ class JwtConfigTest {
     }
 
     @Test
-    fun `test JwtConfig from loads from application config`() {
-        val config = JwtConfig.from(jwtConfig())
+    fun `test JwtConfig decodes from config section`() {
+        val config = decode()
         assertEquals("local-development-secret-key-minimum-32-bytes-long!", config.secret)
         assertEquals("somiq-server", config.issuer)
         assertEquals("somiq-app", config.audience)
@@ -93,22 +82,24 @@ class JwtConfigTest {
         assertEquals(1.hours, config.accessTokenLifetime)
         assertEquals(7.days, config.refreshTokenLifetime)
         assertEquals(30.minutes, config.signupTokenLifetime)
+        assertNotNull(config.verifier)
     }
 
     @Test
-    fun `test JwtConfig from throws when secret is missing`() {
-        val ex = assertFailsWith<IllegalStateException> {
-            JwtConfig.from(jwtConfig("jwt.secret" to ""))
-        }
-        assertTrue(ex.message!!.contains("jwt.secret"))
+    fun `test JwtConfig decode reads readable durations with spaces`() {
+        assertEquals(90.minutes, decode("jwt.accessTokenLifetime" to "1h 30m").accessTokenLifetime)
     }
 
     @Test
-    fun `test JwtConfig from throws on invalid duration`() {
-        val ex = assertFailsWith<IllegalStateException> {
-            JwtConfig.from(jwtConfig("jwt.accessTokenLifetime" to "one hour"))
-        }
-        assertTrue(ex.message!!.contains("jwt.accessTokenLifetime"))
+    fun `test JwtConfig decode rejects blank secret`() {
+        val ex = assertFailsWith<IllegalArgumentException> { decode("jwt.secret" to "") }
+        assertTrue(ex.message!!.contains("JWT_SECRET"))
+    }
+
+    @Test
+    fun `test JwtConfig decode rejects invalid duration`() {
+        val ex = assertFailsWith<IllegalArgumentException> { decode("jwt.accessTokenLifetime" to "one hour") }
+        assertTrue(ex.message!!.contains("one hour"))
     }
 
     @Test

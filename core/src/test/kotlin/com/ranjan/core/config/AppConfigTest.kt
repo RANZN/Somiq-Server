@@ -20,12 +20,11 @@ class AppConfigTest {
     private fun testConfig(vararg overrides: Pair<String, String>): MapApplicationConfig {
         val values = linkedMapOf(
             "app.env" to "LOCAL",
-            "app.corsHosts" to "localhost, 127.0.0.1",
+            "cors.allowedHosts" to "localhost, 127.0.0.1",
             "jwt.secret" to "test-secret-key-that-is-at-least-32-characters",
             "jwt.issuer" to "somiq-server",
             "jwt.audience" to "somiq-app",
             "jwt.signupAudience" to "somiq-signup",
-            "jwt.realm" to "auth-jwt",
             "jwt.accessTokenLifetime" to "1h",
             "jwt.refreshTokenLifetime" to "7d",
             "jwt.signupTokenLifetime" to "30m",
@@ -37,6 +36,14 @@ class AppConfigTest {
         return MapApplicationConfig(*values.toList().toTypedArray())
     }
 
+    private val stratusValues = arrayOf(
+        "storage.provider" to "STRATUS",
+        "storage.stratus.bucketUrl" to "https://somiq-uploads-development.zohostratus.in",
+        "storage.stratus.oauth.clientId" to "client-id",
+        "storage.stratus.oauth.clientSecret" to "client-secret",
+        "storage.stratus.oauth.refreshToken" to "refresh-token"
+    )
+
     @Test
     fun `test AppEnv enum values and flags`() {
         assertEquals(listOf(AppEnv.LOCAL, AppEnv.PRODUCTION), AppEnv.entries)
@@ -45,84 +52,85 @@ class AppConfigTest {
     }
 
     @Test
-    fun `test CorsConfig initialization`() {
-        val prodCors = CorsConfig(
-            env = AppEnv.PRODUCTION,
-            allowedHosts = listOf("example.com", "api.example.com")
-        )
-        assertEquals(AppEnv.PRODUCTION, prodCors.env)
-        assertEquals(2, prodCors.allowedHosts.size)
-
-        val localCors = CorsConfig(env = AppEnv.LOCAL)
-        assertEquals(emptyList(), localCors.allowedHosts)
-    }
-
-    @Test
-    fun `test CorsConfig from splits comma separated hosts`() {
-        val cors = CorsConfig.from(testConfig(), AppEnv.LOCAL)
-        assertEquals(listOf("localhost", "127.0.0.1"), cors.allowedHosts)
-    }
-
-    @Test
     fun `test StorageProvider enum values`() {
         assertEquals(listOf(StorageProvider.LOCAL, StorageProvider.GCS, StorageProvider.STRATUS), StorageProvider.entries)
     }
 
     @Test
-    fun `test StorageConfig from returns Local when selected`() {
-        assertEquals(StorageConfig.Local, StorageConfig.from(testConfig()))
-    }
-
-    @Test
-    fun `test StorageConfig defaults to Stratus and requires its settings`() {
-        val config = MapApplicationConfig("app.env" to "LOCAL")
-        val ex = assertFailsWith<IllegalStateException> { StorageConfig.from(config) }
-        assertTrue(ex.message!!.contains("storage.stratus.bucketUrl"))
-    }
-
-    @Test
-    fun `test StorageConfig from returns Stratus with OAuth settings`() {
-        val storage = assertIs<StorageConfig.Stratus>(
-            StorageConfig.from(
-                testConfig(
-                    "storage.provider" to "STRATUS",
-                    "storage.stratus.bucketUrl" to "https://somiq-uploads-development.zohostratus.in",
-                    "storage.stratus.clientId" to "client-id",
-                    "storage.stratus.clientSecret" to "client-secret",
-                    "storage.stratus.refreshToken" to "refresh-token"
-                )
-            )
-        )
-        assertEquals("https://somiq-uploads-development.zohostratus.in", storage.bucketUrl)
-        assertEquals("https://accounts.zoho.in", storage.oauth.accountsUrl)
-    }
-
-    @Test
-    fun `test StorageConfig from returns Gcs with default public URL`() {
-        val storage = assertIs<StorageConfig.Gcs>(
-            StorageConfig.from(
-                testConfig("storage.provider" to "GCS", "storage.gcs.bucket" to "somiq-uploads")
-            )
-        )
-        assertEquals("https://storage.googleapis.com/somiq-uploads", storage.publicUrlPrefix)
-    }
-
-    @Test
-    fun `test AppConfig from aggregates all subconfigs`() {
-        val config = testConfig()
-        val appConfig = AppConfig.from(config)
+    fun `test AppConfig from aggregates all sections`() {
+        val appConfig = AppConfig.from(testConfig())
         assertEquals(AppEnv.LOCAL, appConfig.env)
-        assertEquals(StorageConfig.from(config), appConfig.storage)
+        assertEquals(StorageConfig.Local, appConfig.storage)
         assertEquals("org.h2.Driver", appConfig.database.driver)
         assertEquals("somiq-server", appConfig.jwt.issuer)
     }
 
     @Test
+    fun `test AppConfig from reads app env case-insensitively`() {
+        assertEquals(AppEnv.PRODUCTION, AppConfig.from(testConfig("app.env" to "production")).env)
+    }
+
+    @Test
     fun `test AppConfig from rejects invalid app env`() {
-        val ex = assertFailsWith<IllegalStateException> {
+        val ex = assertFailsWith<IllegalArgumentException> {
             AppConfig.from(testConfig("app.env" to "STAGING"))
         }
         assertTrue(ex.message!!.contains("app.env"))
+    }
+
+    @Test
+    fun `test CorsConfig splits comma separated hosts and takes env from app section`() {
+        val cors = AppConfig.from(testConfig("app.env" to "PRODUCTION")).cors
+        assertEquals(AppEnv.PRODUCTION, cors.env)
+        assertEquals(listOf("localhost", "127.0.0.1"), cors.allowedHosts)
+    }
+
+    @Test
+    fun `test CorsConfig defaults`() {
+        val cors = CorsConfig()
+        assertEquals(AppEnv.LOCAL, cors.env)
+        assertEquals(emptyList(), cors.allowedHosts)
+    }
+
+    @Test
+    fun `test storage defaults to Stratus when provider is not set`() {
+        val config = testConfig(*stratusValues)
+        config.put("storage.provider", "")
+        assertIs<StorageConfig.Stratus>(AppConfig.from(config).storage)
+    }
+
+    @Test
+    fun `test storage reads Stratus with OAuth settings`() {
+        val storage = assertIs<StorageConfig.Stratus>(AppConfig.from(testConfig(*stratusValues)).storage)
+        assertEquals("https://somiq-uploads-development.zohostratus.in", storage.bucketUrl)
+        assertEquals("client-id", storage.oauth.clientId)
+        assertEquals("https://accounts.zoho.in", storage.oauth.accountsUrl)
+    }
+
+    @Test
+    fun `test storage rejects blank Stratus settings`() {
+        val ex = assertFailsWith<IllegalArgumentException> {
+            AppConfig.from(testConfig(*stratusValues, "storage.stratus.bucketUrl" to ""))
+        }
+        assertTrue(ex.message!!.contains("STRATUS_BUCKET_URL"))
+    }
+
+    @Test
+    fun `test storage reads Gcs with default public URL`() {
+        val storage = assertIs<StorageConfig.Gcs>(
+            AppConfig.from(
+                testConfig("storage.provider" to "GCS", "storage.gcs.bucket" to "somiq-uploads")
+            ).storage
+        )
+        assertEquals("https://storage.googleapis.com/somiq-uploads", storage.resolvedPublicUrlPrefix)
+    }
+
+    @Test
+    fun `test AppConfig from rejects blank JWT secret`() {
+        val ex = assertFailsWith<IllegalArgumentException> {
+            AppConfig.from(testConfig("jwt.secret" to ""))
+        }
+        assertTrue(ex.message!!.contains("JWT_SECRET"))
     }
 
     @Test
@@ -136,13 +144,5 @@ class AppConfigTest {
         assertEquals(appConfig.jwt, koinApp.koin.get<JwtConfig>())
         assertNotNull(koinApp.koin.get<MediaStorageService>())
         assertNotNull(koinApp.koin.get<Database>())
-    }
-
-    @Test
-    fun `test AppConfig from throws when a required value is missing`() {
-        val ex = assertFailsWith<IllegalStateException> {
-            AppConfig.from(testConfig("jwt.secret" to ""))
-        }
-        assertTrue(ex.message!!.contains("jwt.secret"))
     }
 }

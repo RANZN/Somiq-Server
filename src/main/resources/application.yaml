@@ -8,7 +8,9 @@ ktor:
 
 app:
     env: "$APP_ENV:LOCAL"
-    corsHosts: "$ALLOWED_CORS_HOSTS:localhost"
+
+cors:
+    allowedHosts: "$ALLOWED_CORS_HOSTS:localhost"
 
 jwt:
     secret: "$JWT_SECRET"
@@ -29,10 +31,11 @@ storage:
     provider: "$STORAGE_PROVIDER:STRATUS"
     stratus:
         bucketUrl: "$STRATUS_BUCKET_URL:"
-        accountsUrl: "https://accounts.zoho.in"
-        clientId: "$ZOHO_CLIENT_ID:"
-        clientSecret: "$ZOHO_CLIENT_SECRET:"
-        refreshToken: "$ZOHO_REFRESH_TOKEN:"
+        oauth:
+            accountsUrl: "https://accounts.zoho.in"
+            clientId: "$ZOHO_CLIENT_ID:"
+            clientSecret: "$ZOHO_CLIENT_SECRET:"
+            refreshToken: "$ZOHO_REFRESH_TOKEN:"
     gcs:
         bucket: "$GCS_BUCKET_NAME:"
         publicUrlPrefix: "$GCS_PUBLIC_URL_PREFIX:"

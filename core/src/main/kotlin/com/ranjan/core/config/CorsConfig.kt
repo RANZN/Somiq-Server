@@ -1,21 +1,14 @@
 package com.ranjan.core.config
 
-import io.ktor.server.config.ApplicationConfig
+import com.ranjan.core.config.serializer.CommaSeparatedListSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
+/** CORS settings, read from the `cors` section of application.yaml. [env] is filled in from `app.env`. */
+@Serializable
 data class CorsConfig(
-    val env: AppEnv,
+    @Transient
+    val env: AppEnv = AppEnv.LOCAL,
+    @Serializable(with = CommaSeparatedListSerializer::class)
     val allowedHosts: List<String> = emptyList()
-) {
-    companion object {
-        fun from(config: ApplicationConfig, env: AppEnv): CorsConfig {
-            val allowedHosts = config.requireString("app.corsHosts")
-                .split(",")
-                .map { it.trim() }
-                .filter { it.isNotEmpty() }
-            return CorsConfig(
-                env = env,
-                allowedHosts = allowedHosts
-            )
-        }
-    }
-}
+)
