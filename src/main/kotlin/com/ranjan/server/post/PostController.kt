@@ -7,7 +7,6 @@ import com.ranjan.core.model.ErrorResponse
 import com.ranjan.domain.common.model.PaginationRequest
 import com.ranjan.domain.post.model.CreatePostRequest
 import com.ranjan.domain.post.model.UpdatePostRequest
-import com.ranjan.domain.post.model.withAbsoluteUrls
 import com.ranjan.domain.post.usecase.*
 import com.ranjan.server.common.extension.getExtension
 import com.ranjan.server.common.extension.userId

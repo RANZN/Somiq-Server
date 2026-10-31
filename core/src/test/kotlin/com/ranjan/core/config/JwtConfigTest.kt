@@ -1,14 +1,31 @@
 package com.ranjan.core.config
 
+import io.ktor.server.config.MapApplicationConfig
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 class JwtConfigTest {
+
+    private fun jwtConfig(vararg overrides: Pair<String, String>): MapApplicationConfig {
+        val values = linkedMapOf(
+            "jwt.secret" to "local-development-secret-key-minimum-32-bytes-long!",
+            "jwt.issuer" to "somiq-server",
+            "jwt.audience" to "somiq-app",
+            "jwt.signupAudience" to "somiq-signup",
+            "jwt.realm" to "auth-jwt",
+            "jwt.accessTokenLifetime" to "1h",
+            "jwt.refreshTokenLifetime" to "7d",
+            "jwt.signupTokenLifetime" to "30m"
+        )
+        values.putAll(overrides)
+        return MapApplicationConfig(*values.toList().toTypedArray())
+    }
 
     @Test
     fun `test JwtConfig constructor creates valid instance`() {
@@ -71,8 +88,8 @@ class JwtConfigTest {
     }
 
     @Test
-    fun `test JwtConfig from loads from environment`() {
-        val config = JwtConfig.from(Env.load())
+    fun `test JwtConfig from loads from application config`() {
+        val config = JwtConfig.from(jwtConfig())
         assertEquals("local-development-secret-key-minimum-32-bytes-long!", config.secret)
         assertEquals("somiq-server", config.issuer)
         assertEquals("somiq-app", config.audience)
@@ -84,10 +101,19 @@ class JwtConfigTest {
     }
 
     @Test
-    fun `test JwtConfig fromEnv throws when variable is missing`() {
-        assertFailsWith<IllegalStateException> {
-            JwtConfig.from(Env.from(emptyMap()))
+    fun `test JwtConfig from throws when secret is missing`() {
+        val ex = assertFailsWith<IllegalStateException> {
+            JwtConfig.from(jwtConfig("jwt.secret" to ""))
         }
+        assertTrue(ex.message!!.contains("jwt.secret"))
+    }
+
+    @Test
+    fun `test JwtConfig from throws on invalid duration`() {
+        val ex = assertFailsWith<IllegalStateException> {
+            JwtConfig.from(jwtConfig("jwt.accessTokenLifetime" to "one hour"))
+        }
+        assertTrue(ex.message!!.contains("jwt.accessTokenLifetime"))
     }
 
     @Test
