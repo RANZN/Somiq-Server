@@ -40,7 +40,7 @@ val storageModule = module {
             is StorageConfig.Gcs -> GcsMediaStorageService(
                 bucketName = config.bucket,
                 storage = GcsClientFactory.create(config),
-                urlResolver = GcsStorageUrlResolver(config.publicUrlPrefix),
+                urlResolver = GcsStorageUrlResolver(config.resolvedPublicUrlPrefix),
                 mimeTypeResolver = get(),
                 fileFormatDetector = get()
             )

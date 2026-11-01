@@ -5,3 +5,40 @@ ktor:
     deployment:
         host: "$HOST:0.0.0.0"
         port: "$PORT:8080"
+
+app:
+    env: "$APP_ENV:LOCAL"
+
+cors:
+    allowedHosts: "$ALLOWED_CORS_HOSTS:localhost"
+
+jwt:
+    secret: "$JWT_SECRET"
+    issuer: "somiq-server"
+    audience: "somiq-app"
+    signupAudience: "somiq-signup"
+    accessTokenLifetime: "1h"
+    refreshTokenLifetime: "7d"
+    signupTokenLifetime: "30m"
+
+database:
+    url: "$DB_URL"
+    user: "$DB_USER"
+    password: "$DB_PASSWORD:"
+    maxPoolSize: 10
+
+storage:
+    provider: "$STORAGE_PROVIDER:STRATUS"
+    stratus:
+        bucketUrl: "$STRATUS_BUCKET_URL:"
+        oauth:
+            accountsUrl: "https://accounts.zoho.in"
+            clientId: "$ZOHO_CLIENT_ID:"
+            clientSecret: "$ZOHO_CLIENT_SECRET:"
+            refreshToken: "$ZOHO_REFRESH_TOKEN:"
+    gcs:
+        bucket: "$GCS_BUCKET_NAME:"
+        publicUrlPrefix: "$GCS_PUBLIC_URL_PREFIX:"
+        projectId: "$GCS_PROJECT_ID:"
+        credentialsPath: "$GCS_CREDENTIALS_PATH:"
+        credentialsJson: "$GCS_CREDENTIALS_JSON:"

@@ -24,7 +24,6 @@ class JwtTokenServicesTest {
         issuer = "test-issuer",
         audience = "test-audience",
         signupAudience = "test-signup-audience",
-        realm = "test-realm",
         accessTokenLifetime = 1.hours,
         refreshTokenLifetime = 7.minutes,
         signupTokenLifetime = 30.seconds

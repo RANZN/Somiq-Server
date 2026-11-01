@@ -14,13 +14,13 @@ import com.ranjan.server.post.postRoutes
 import com.ranjan.server.reel.reelRoutes
 import com.ranjan.server.search.searchRoutes
 import com.ranjan.server.story.storyRoutes
-import com.ranjan.server.update.checkUpdateRoute
+import com.ranjan.server.system.systemRoutes
 import io.ktor.server.application.Application
 import io.ktor.server.auth.authenticate
 import io.ktor.server.routing.routing
 
 fun Application.configureRoutes() {
-    checkUpdateRoute()
+    systemRoutes()
     authRoutes()
     mediaRoutes()
     postRoutes()

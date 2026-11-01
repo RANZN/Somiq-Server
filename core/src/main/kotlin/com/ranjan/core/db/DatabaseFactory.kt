@@ -1,5 +1,6 @@
 package com.ranjan.core.db
 
+import com.ranjan.core.config.DatabaseConfig
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.jetbrains.exposed.sql.Database

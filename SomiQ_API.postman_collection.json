@@ -1,1503 +1,1818 @@
 {
-	"info": {
-		"_postman_id": "SomiQ-api",
-		"name": "SomiQ  API",
-		"description": "Complete API collection for SomiQ  application",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-	},
-	"item": [
-		{
-			"name": "Authentication",
-			"item": [
-				{
-					"name": "Sign Up",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/auth/signup",
-							"host": ["{{base_url}}"],
-							"path": ["auth", "signup"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Login",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    var jsonData = pm.response.json();",
-									"    if (jsonData.token && jsonData.token.accessToken) {",
-									"        pm.collectionVariables.set(\"auth_token\", jsonData.token.accessToken);",
-									"        pm.environment.set(\"auth_token\", jsonData.token.accessToken);",
-									"    }",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/auth/login",
-							"host": ["{{base_url}}"],
-							"path": ["auth", "login"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Logout",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/auth/logout",
-							"host": ["{{base_url}}"],
-							"path": ["auth", "logout"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Forgot Password",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"email\": \"john@example.com\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/auth/forgot",
-							"host": ["{{base_url}}"],
-							"path": ["auth", "forgot"]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Posts",
-			"item": [
-				{
-					"name": "Get Posts Feed",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/posts?limit=20&after=",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "posts"],
-							"query": [
-								{
-									"key": "limit",
-									"value": "20"
-								},
-								{
-									"key": "after",
-									"value": "",
-									"disabled": true
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Post by ID",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/posts/:postId",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "posts", ":postId"],
-							"variable": [
-								{
-									"key": "postId",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Post",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"title\": \"My First Post\",\n  \"content\": \"This is the content of my post\",\n  \"mediaUrls\": [\"https://example.com/image1.jpg\", \"https://example.com/image2.jpg\"]\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/posts",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "posts"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Post",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"title\": \"Updated Title\",\n  \"content\": \"Updated content\",\n  \"mediaUrls\": [\"https://example.com/new-image.jpg\"]\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/posts/:postId",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "posts", ":postId"],
-							"variable": [
-								{
-									"key": "postId",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Post",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/posts/:postId",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "posts", ":postId"],
-							"variable": [
-								{
-									"key": "postId",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Like Post",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/posts/:postId/like",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "posts", ":postId", "like"],
-							"variable": [
-								{
-									"key": "postId",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Bookmark Post",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/posts/:postId/bookmark",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "posts", ":postId", "bookmark"],
-							"variable": [
-								{
-									"key": "postId",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Reels",
-			"item": [
-				{
-					"name": "Get Reels Feed",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/reels?limit=20&after=",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "reels"],
-							"query": [
-								{
-									"key": "limit",
-									"value": "20"
-								},
-								{
-									"key": "after",
-									"value": "",
-									"disabled": true
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Reel by ID",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/reels/:reelId",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "reels", ":reelId"],
-							"variable": [
-								{
-									"key": "reelId",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Reel",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"title\": \"My Awesome Reel\",\n  \"description\": \"Check out this reel!\",\n  \"videoUrl\": \"https://example.com/video.mp4\",\n  \"thumbnailUrl\": \"https://example.com/thumbnail.jpg\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/reels",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "reels"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Reel",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"title\": \"Updated Title\",\n  \"description\": \"Updated description\",\n  \"thumbnailUrl\": \"https://example.com/new-thumbnail.jpg\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/reels/:reelId",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "reels", ":reelId"],
-							"variable": [
-								{
-									"key": "reelId",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Reel",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/reels/:reelId",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "reels", ":reelId"],
-							"variable": [
-								{
-									"key": "reelId",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Like Reel",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/reels/:reelId/like",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "reels", ":reelId", "like"],
-							"variable": [
-								{
-									"key": "reelId",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Bookmark Reel",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/reels/:reelId/bookmark",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "reels", ":reelId", "bookmark"],
-							"variable": [
-								{
-									"key": "reelId",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Comments",
-			"item": [
-				{
-					"name": "Get Comments",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/comments?postId=&reelId=&parentCommentId=&limit=20&after=",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "comments"],
-							"query": [
-								{
-									"key": "postId",
-									"value": "",
-									"description": "For post comments"
-								},
-								{
-									"key": "reelId",
-									"value": "",
-									"description": "For reel comments",
-									"disabled": true
-								},
-								{
-									"key": "parentCommentId",
-									"value": "",
-									"description": "For nested replies",
-									"disabled": true
-								},
-								{
-									"key": "limit",
-									"value": "20"
-								},
-								{
-									"key": "after",
-									"value": "",
-									"disabled": true
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Comment",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"content\": \"Great post!\",\n  \"parentCommentId\": null\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/comments?postId=&reelId=",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "comments"],
-							"query": [
-								{
-									"key": "postId",
-									"value": "",
-									"description": "For post comments"
-								},
-								{
-									"key": "reelId",
-									"value": "",
-									"description": "For reel comments",
-									"disabled": true
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Reply to Comment",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"content\": \"Thanks!\",\n  \"parentCommentId\": \"comment-id-here\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/comments?postId=&reelId=",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "comments"],
-							"query": [
-								{
-									"key": "postId",
-									"value": ""
-								},
-								{
-									"key": "reelId",
-									"value": "",
-									"disabled": true
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Comment",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"content\": \"Updated comment text\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/comments/:commentId",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "comments", ":commentId"],
-							"variable": [
-								{
-									"key": "commentId",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Comment",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/comments/:commentId",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "comments", ":commentId"],
-							"variable": [
-								{
-									"key": "commentId",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Like Comment",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/comments/:commentId/like",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "comments", ":commentId", "like"],
-							"variable": [
-								{
-									"key": "commentId",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Stories",
-			"item": [
-				{
-					"name": "Get Stories Feed",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/stories?limit=20&after=",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "stories"],
-							"query": [
-								{
-									"key": "limit",
-									"value": "20"
-								},
-								{
-									"key": "after",
-									"value": "",
-									"disabled": true
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get User Stories",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/stories/user/:userId",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "stories", "user", ":userId"],
-							"variable": [
-								{
-									"key": "userId",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get My Stories",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/stories/me",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "stories", "me"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Story",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"mediaUrl\": \"https://example.com/story-image.jpg\",\n  \"mediaType\": \"IMAGE\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/stories",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "stories"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Story",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/stories/:storyId",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "stories", ":storyId"],
-							"variable": [
-								{
-									"key": "storyId",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "View Story",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/stories/:storyId/view",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "stories", ":storyId", "view"],
-							"variable": [
-								{
-									"key": "storyId",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Notifications",
-			"item": [
-				{
-					"name": "Get Notifications",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/notifications?unreadOnly=false&limit=20&after=",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "notifications"],
-							"query": [
-								{
-									"key": "unreadOnly",
-									"value": "false"
-								},
-								{
-									"key": "limit",
-									"value": "20"
-								},
-								{
-									"key": "after",
-									"value": "",
-									"disabled": true
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Unread Count",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/notifications/unread-count",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "notifications", "unread-count"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Mark Notification as Read",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "PUT",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/notifications/:notificationId/read",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "notifications", ":notificationId", "read"],
-							"variable": [
-								{
-									"key": "notificationId",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Mark All as Read",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "PUT",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/notifications/read-all",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "notifications", "read-all"]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Collections",
-			"item": [
-				{
-					"name": "Get Collections",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/collections",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "collections"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Collection",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"name\": \"My Favorites\",\n  \"description\": \"My favorite posts and reels\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/collections",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "collections"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Collection",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"name\": \"Updated Name\",\n  \"description\": \"Updated description\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/collections/:collectionId",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "collections", ":collectionId"],
-							"variable": [
-								{
-									"key": "collectionId",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Collection",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/collections/:collectionId",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "collections", ":collectionId"],
-							"variable": [
-								{
-									"key": "collectionId",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Collection Items",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/collections/:collectionId/items",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "collections", ":collectionId", "items"],
-							"variable": [
-								{
-									"key": "collectionId",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Add Item to Collection",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"itemType\": \"POST\",\n  \"itemId\": \"post-id-here\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/collections/:collectionId/items",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "collections", ":collectionId", "items"],
-							"variable": [
-								{
-									"key": "collectionId",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Remove Item from Collection",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/collections/:collectionId/items/:itemId",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "collections", ":collectionId", "items", ":itemId"],
-							"variable": [
-								{
-									"key": "collectionId",
-									"value": ""
-								},
-								{
-									"key": "itemId",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Search",
-			"item": [
-				{
-					"name": "Search All",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/search?q=test&type=all&limit=20",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "search"],
-							"query": [
-								{
-									"key": "q",
-									"value": "test",
-									"description": "Search query"
-								},
-								{
-									"key": "type",
-									"value": "all",
-									"description": "all, users, posts, or reels"
-								},
-								{
-									"key": "limit",
-									"value": "20"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Search Users",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/search?q=john&type=users&limit=20",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "search"],
-							"query": [
-								{
-									"key": "q",
-									"value": "john"
-								},
-								{
-									"key": "type",
-									"value": "users"
-								},
-								{
-									"key": "limit",
-									"value": "20"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Search Posts",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/search?q=travel&type=posts&limit=20",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "search"],
-							"query": [
-								{
-									"key": "q",
-									"value": "travel"
-								},
-								{
-									"key": "type",
-									"value": "posts"
-								},
-								{
-									"key": "limit",
-									"value": "20"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Search Reels",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/search?q=funny&type=reels&limit=20",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "search"],
-							"query": [
-								{
-									"key": "q",
-									"value": "funny"
-								},
-								{
-									"key": "type",
-									"value": "reels"
-								},
-								{
-									"key": "limit",
-									"value": "20"
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Account",
-			"item": [
-				{
-					"name": "Get My Profile",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/account",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "account"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get User Profile",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/account/:userId",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "account", ":userId"],
-							"variable": [
-								{
-									"key": "userId",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Profile",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"name\": \"John Updated\",\n  \"username\": \"johndoe\",\n  \"bio\": \"This is my bio\",\n  \"profilePictureUrl\": \"https://example.com/profile.jpg\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/account/profile",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "account", "profile"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Follow User",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{auth_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/v1/account/follow/:userId",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "account", "follow", ":userId"],
-							"variable": [
-								{
-									"key": "userId",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		}
-	],
-	"variable": [
-		{
-			"key": "base_url",
-			"value": "http://localhost:8080",
-			"type": "string"
-		},
-		{
-			"key": "auth_token",
-			"value": "",
-			"type": "string"
-		}
-	]
+  "info": {
+    "name": "SomiQ API",
+    "description": "SomiQ server API.\n\nSign in: run **Verify OTP** with the development code `000000`. If the response status is `LOGGED_IN`, the access and refresh tokens are saved automatically. If it is `SIGNUP_REQUIRED`, run **Complete Signup**, which uses the saved signup token.\n\nRequests use bearer auth with `{{auth_token}}` unless marked as public.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{auth_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "auth_token",
+      "value": ""
+    },
+    {
+      "key": "refresh_token",
+      "value": ""
+    },
+    {
+      "key": "signup_token",
+      "value": ""
+    },
+    {
+      "key": "phone",
+      "value": "+919999999999"
+    },
+    {
+      "key": "device_id",
+      "value": "postman-device"
+    },
+    {
+      "key": "user_id",
+      "value": ""
+    },
+    {
+      "key": "post_id",
+      "value": ""
+    },
+    {
+      "key": "reel_id",
+      "value": ""
+    },
+    {
+      "key": "comment_id",
+      "value": ""
+    },
+    {
+      "key": "story_id",
+      "value": ""
+    },
+    {
+      "key": "collection_id",
+      "value": ""
+    },
+    {
+      "key": "item_id",
+      "value": ""
+    },
+    {
+      "key": "notification_id",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "System",
+      "item": [
+        {
+          "name": "Root",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": []
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Check Update",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/checkUpdate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "checkUpdate"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Verify OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/verify-otp",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "verify-otp"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"{{phone}}\",\n  \"otp\": \"000000\",\n  \"deviceId\": \"{{device_id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Returns `LOGGED_IN` with tokens for an existing user, or `SIGNUP_REQUIRED` with a signup token. `000000` is the development OTP."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const token = json.token || json;",
+                  "if (token && token.accessToken) {",
+                  "    pm.collectionVariables.set('auth_token', token.accessToken);",
+                  "    pm.collectionVariables.set('refresh_token', token.refreshToken);",
+                  "}",
+                  "if (json.signupToken) {",
+                  "    pm.collectionVariables.set('signup_token', json.signupToken);",
+                  "}",
+                  "if (json.user && json.user.userId) {",
+                  "    pm.collectionVariables.set('user_id', json.user.userId);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Check User ID",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/check-user-id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "check-user-id"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"john_doe\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Complete Signup",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{signup_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/complete-signup",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "complete-signup"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"userId\": \"john_doe\",\n  \"email\": \"john@example.com\",\n  \"profilePictureUrl\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Uses the signup token from **Verify OTP** in the Authorization header."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const token = json.token || json;",
+                  "if (token && token.accessToken) {",
+                  "    pm.collectionVariables.set('auth_token', token.accessToken);",
+                  "    pm.collectionVariables.set('refresh_token', token.refreshToken);",
+                  "}",
+                  "if (json.signupToken) {",
+                  "    pm.collectionVariables.set('signup_token', json.signupToken);",
+                  "}",
+                  "if (json.user && json.user.userId) {",
+                  "    pm.collectionVariables.set('user_id', json.user.userId);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/refresh",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const token = json.token || json;",
+                  "if (token && token.accessToken) {",
+                  "    pm.collectionVariables.set('auth_token', token.accessToken);",
+                  "    pm.collectionVariables.set('refresh_token', token.refreshToken);",
+                  "}",
+                  "if (json.signupToken) {",
+                  "    pm.collectionVariables.set('signup_token', json.signupToken);",
+                  "}",
+                  "if (json.user && json.user.userId) {",
+                  "    pm.collectionVariables.set('user_id', json.user.userId);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Media",
+      "item": [
+        {
+          "name": "Upload Media",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/media/upload",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "media",
+                "upload"
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "description": "Uploads one file and returns its URL."
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Profile Picture",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/media/upload?type=profile_pic",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "media",
+                "upload"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "profile_pic"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Posts",
+      "item": [
+        {
+          "name": "Get Posts Feed",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/posts?limit=20&after=",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "posts"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "after",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Bookmarked Posts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/posts/bookmarks?limit=20&after=",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "posts",
+                "bookmarks"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "after",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Post by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/posts/{{post_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "posts",
+                "{{post_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Post",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/posts",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "posts"
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "caption",
+                  "value": "My first post",
+                  "type": "text"
+                },
+                {
+                  "key": "media",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "description": "Multipart form: a `caption` field plus one or more files."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Post",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/v1/posts/{{post_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "posts",
+                "{{post_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"caption\": \"Updated caption\",\n  \"mediaUrls\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Post",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/posts/{{post_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "posts",
+                "{{post_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Like Post",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/posts/{{post_id}}/like",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "posts",
+                "{{post_id}}",
+                "like"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Bookmark Post",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/posts/{{post_id}}/bookmark",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "posts",
+                "{{post_id}}",
+                "bookmark"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reels",
+      "item": [
+        {
+          "name": "Get Reels Feed",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/reels?limit=20&after=",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "reels"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "after",
+                  "value": ""
+                }
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Reel by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/reels/{{reel_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "reels",
+                "{{reel_id}}"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Reel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/v1/reels",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "reels"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"My reel\",\n  \"description\": \"Check this out\",\n  \"videoUrl\": \"https://example.com/video.mp4\",\n  \"thumbnailUrl\": \"https://example.com/thumbnail.jpg\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Reel",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/v1/reels/{{reel_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "reels",
+                "{{reel_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated title\",\n  \"description\": \"Updated description\",\n  \"thumbnailUrl\": \"https://example.com/new-thumbnail.jpg\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Reel",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/reels/{{reel_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "reels",
+                "{{reel_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Like Reel",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/reels/{{reel_id}}/like",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "reels",
+                "{{reel_id}}",
+                "like"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Bookmark Reel",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/reels/{{reel_id}}/bookmark",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "reels",
+                "{{reel_id}}",
+                "bookmark"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Comments",
+      "item": [
+        {
+          "name": "Get Post Comments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/comments?postId={{post_id}}&limit=20&after=",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "comments"
+              ],
+              "query": [
+                {
+                  "key": "postId",
+                  "value": "{{post_id}}"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "after",
+                  "value": ""
+                }
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Reel Comments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/comments?reelId={{reel_id}}&limit=20&after=",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "comments"
+              ],
+              "query": [
+                {
+                  "key": "reelId",
+                  "value": "{{reel_id}}"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "after",
+                  "value": ""
+                }
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Replies",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/comments?postId={{post_id}}&parentCommentId={{comment_id}}&limit=20&after=",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "comments"
+              ],
+              "query": [
+                {
+                  "key": "postId",
+                  "value": "{{post_id}}"
+                },
+                {
+                  "key": "parentCommentId",
+                  "value": "{{comment_id}}"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "after",
+                  "value": ""
+                }
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Comment on Post",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/v1/comments?postId={{post_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "comments"
+              ],
+              "query": [
+                {
+                  "key": "postId",
+                  "value": "{{post_id}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Nice post!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Comment on Reel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/v1/comments?reelId={{reel_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "comments"
+              ],
+              "query": [
+                {
+                  "key": "reelId",
+                  "value": "{{reel_id}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Nice reel!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reply to Comment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/v1/comments?postId={{post_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "comments"
+              ],
+              "query": [
+                {
+                  "key": "postId",
+                  "value": "{{post_id}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Thanks!\",\n  \"parentCommentId\": \"{{comment_id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Comment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/v1/comments/{{comment_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "comments",
+                "{{comment_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Edited comment\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Comment",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/comments/{{comment_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "comments",
+                "{{comment_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Like Comment",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/comments/{{comment_id}}/like",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "comments",
+                "{{comment_id}}",
+                "like"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Stories",
+      "item": [
+        {
+          "name": "Get Stories Feed",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/stories?limit=20&after=",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "stories"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "after",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Stories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/stories/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "stories",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Stories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/stories/user/{{user_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "stories",
+                "user",
+                "{{user_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Story by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/stories/{{story_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "stories",
+                "{{story_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Story",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/v1/stories",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "stories"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mediaUrl\": \"https://example.com/story.jpg\",\n  \"mediaType\": \"IMAGE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "`mediaType` is `IMAGE` or `VIDEO`."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Story",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/stories/{{story_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "stories",
+                "{{story_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "View Story",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/stories/{{story_id}}/view",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "stories",
+                "{{story_id}}",
+                "view"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Get Notifications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/notifications?unreadOnly=false&limit=20&after=",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "notifications"
+              ],
+              "query": [
+                {
+                  "key": "unreadOnly",
+                  "value": "false"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "after",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Unread Count",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/notifications/unread-count",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "notifications",
+                "unread-count"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/notifications/{{notification_id}}/read",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "notifications",
+                "{{notification_id}}",
+                "read"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mark All as Read",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/notifications/read-all",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "notifications",
+                "read-all"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Collections",
+      "item": [
+        {
+          "name": "Get Collections",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/collections",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "collections"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Collection",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/v1/collections",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "collections"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Favourites\",\n  \"description\": \"Posts and reels I like\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Collection",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/v1/collections/{{collection_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "collections",
+                "{{collection_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated name\",\n  \"description\": \"Updated description\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Collection",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/collections/{{collection_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "collections",
+                "{{collection_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Collection Items",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/collections/{{collection_id}}/items",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "collections",
+                "{{collection_id}}",
+                "items"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Item to Collection",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/v1/collections/{{collection_id}}/items",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "collections",
+                "{{collection_id}}",
+                "items"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"itemType\": \"POST\",\n  \"itemId\": \"{{post_id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "`itemType` is `POST` or `REEL`."
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Item from Collection",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/collections/{{collection_id}}/items/{{item_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "collections",
+                "{{collection_id}}",
+                "items",
+                "{{item_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Search",
+      "item": [
+        {
+          "name": "Search All",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/search?q=test&type=all&limit=20",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "test"
+                },
+                {
+                  "key": "type",
+                  "value": "all"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/search?q=john&type=users&limit=20",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "john"
+                },
+                {
+                  "key": "type",
+                  "value": "users"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Posts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/search?q=travel&type=posts&limit=20",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "travel"
+                },
+                {
+                  "key": "type",
+                  "value": "posts"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Reels",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/search?q=funny&type=reels&limit=20",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "funny"
+                },
+                {
+                  "key": "type",
+                  "value": "reels"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Account",
+      "item": [
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/account",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "account"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/account/{{user_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "account",
+                "{{user_id}}"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/v1/account/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "account",
+                "profile"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Updated\",\n  \"username\": \"john_doe\",\n  \"bio\": \"This is my bio\",\n  \"profilePictureUrl\": \"https://example.com/profile.jpg\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Follow or Unfollow User",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/account/follow/{{user_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "account",
+                "follow",
+                "{{user_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
 }
-
