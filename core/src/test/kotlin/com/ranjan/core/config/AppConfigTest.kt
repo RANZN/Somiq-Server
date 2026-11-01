@@ -79,16 +79,15 @@ class AppConfigTest {
     }
 
     @Test
-    fun `test CorsConfig splits comma separated hosts and takes env from app section`() {
-        val cors = AppConfig.from(testConfig("app.env" to "PRODUCTION")).cors
-        assertEquals(AppEnv.PRODUCTION, cors.env)
-        assertEquals(listOf("localhost", "127.0.0.1"), cors.allowedHosts)
+    fun `test CorsConfig splits comma separated hosts and env is set at AppConfig level`() {
+        val appConfig = AppConfig.from(testConfig("app.env" to "PRODUCTION"))
+        assertEquals(AppEnv.PRODUCTION, appConfig.env)
+        assertEquals(listOf("localhost", "127.0.0.1"), appConfig.cors.allowedHosts)
     }
 
     @Test
     fun `test CorsConfig defaults`() {
         val cors = CorsConfig()
-        assertEquals(AppEnv.LOCAL, cors.env)
         assertEquals(emptyList(), cors.allowedHosts)
     }
 

@@ -31,7 +31,7 @@ fun Application.module() {
     configureSecurity(config.jwt)
     configureRoutes()
     configureExceptionHandling()
-    configureCORS(config.cors)
+    configureCORS(config.env, config.cors)
 }
 
 fun Application.configureKoin(config: AppConfig) {

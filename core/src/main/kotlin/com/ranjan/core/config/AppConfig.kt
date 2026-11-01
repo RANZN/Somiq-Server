@@ -21,7 +21,7 @@ data class AppConfig(
             val env = config.enum("app.env", AppEnv.LOCAL)
             return AppConfig(
                 env = env,
-                cors = config.property("cors").getAs<CorsConfig>().copy(env = env),
+                cors = config.property("cors").getAs<CorsConfig>(),
                 storage = storage(config),
                 database = config.property("database").getAs(),
                 jwt = config.property("jwt").getAs()
