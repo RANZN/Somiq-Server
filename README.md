@@ -46,7 +46,6 @@ Non-secret settings, such as the JWT issuer, audiences and token lifetimes, are 
 | `APP_ENV` | No | `LOCAL` (default) or `PRODUCTION`. In production, CORS only allows `ALLOWED_CORS_HOSTS`. |
 | `ALLOWED_CORS_HOSTS` | No | Comma-separated hosts allowed by CORS in production. |
 | `X_ZOHO_CATALYST_LISTEN_PORT` | No | Port to listen on. Catalyst AppSail sets it; default `9000`. |
-| `RUN_SCHEMA_SYNC` | No | `true` to add missing columns to existing tables at startup. Default `false`, which only creates missing tables and keeps startup fast. |
 | `STORAGE_PROVIDER` | No | `STRATUS` (default), `GCS` or `LOCAL`. |
 | `STRATUS_BUCKET_URL` | With `STRATUS` | Bucket URL, for example `https://somiq-uploads-development.zohostratus.in`. |
 | `ZOHO_CLIENT_ID` | With `STRATUS` | Zoho Self Client ID. |
@@ -83,6 +82,10 @@ Non-secret settings, such as the JWT issuer, audiences and token lifetimes, are 
     ```bash
     ./gradlew test
     ```
+
+## Database schema
+
+On startup the server creates any tables that do not exist yet (`SchemaUtils.create`). Existing tables are not changed, so after adding a column to an existing table, add it to the database by hand, for example with `ALTER TABLE ... ADD COLUMN ...`.
 
 ## Authentication flow
 
