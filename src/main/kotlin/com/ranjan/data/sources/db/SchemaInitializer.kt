@@ -5,9 +5,17 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 
 object SchemaInitializer {
-    fun init(database: Database) {
+    /**
+     * Creates any missing tables. With [fullSync], also adds missing columns to existing tables,
+     * which scans every table's metadata and adds several seconds to startup.
+     */
+    fun init(database: Database, fullSync: Boolean = false) {
         transaction(database) {
-            SchemaUtils.createMissingTablesAndColumns(*AllTables.toTypedArray())
+            if (fullSync) {
+                SchemaUtils.createMissingTablesAndColumns(*AllTables.toTypedArray())
+            } else {
+                SchemaUtils.create(*AllTables.toTypedArray())
+            }
         }
     }
 }

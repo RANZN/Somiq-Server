@@ -22,6 +22,18 @@ class DatabaseConfigTest {
         assertEquals("root", config.user)
         assertEquals("", config.password)
         assertEquals(5, config.maxPoolSize)
+        assertEquals(false, config.schemaSync)
+    }
+
+    @Test
+    fun `test DatabaseConfig reads schemaSync flag`() {
+        val config = MapApplicationConfig(
+            "database.url" to "jdbc:h2:mem:sync;DB_CLOSE_DELAY=-1",
+            "database.user" to "sa",
+            "database.schemaSync" to "true"
+        ).property("database").getAs<DatabaseConfig>()
+
+        assertEquals(true, config.schemaSync)
     }
 
     @Test

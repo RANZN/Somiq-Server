@@ -8,7 +8,9 @@ data class DatabaseConfig(
     val url: String,
     val user: String,
     val password: String = "",
-    val maxPoolSize: Int = 10
+    val maxPoolSize: Int = 10,
+    /** When true, startup also adds missing columns to existing tables (slow). Set RUN_SCHEMA_SYNC=true after schema changes. */
+    val schemaSync: Boolean = false
 ) {
     init {
         require(url.isNotBlank()) { "Database url must not be blank (set DB_URL)" }
