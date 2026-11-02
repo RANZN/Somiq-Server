@@ -26,7 +26,7 @@ fun main(args: Array<String>) {
 fun Application.module() {
     val config = AppConfig.from(environment.config)
     configureKoin(config)
-    configureDatabase()
+    configureDatabase(config.database.schemaSync)
     configureSerialization()
     configureSecurity(config.jwt)
     configureRoutes()
@@ -41,7 +41,7 @@ fun Application.configureKoin(config: AppConfig) {
     }
 }
 
-fun Application.configureDatabase() {
+fun Application.configureDatabase(fullSchemaSync: Boolean) {
     val database: Database by inject()
-    SchemaInitializer.init(database)
+    SchemaInitializer.init(database, fullSchemaSync)
 }

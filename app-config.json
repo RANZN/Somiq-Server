@@ -1,5 +1,5 @@
 {
-  "command": "java -jar app.jar",
+  "command": "java -XX:TieredStopAtLevel=1 -XX:+UseSerialGC --enable-native-access=ALL-UNNAMED -jar /app/app.jar",
   "stack": "java25",
   "env_variables": {}
 }

@@ -26,6 +26,7 @@ database:
     user: "$DB_USER"
     password: "$DB_PASSWORD:"
     maxPoolSize: 10
+    schemaSync: "$RUN_SCHEMA_SYNC:false"
 
 storage:
     provider: "$STORAGE_PROVIDER:STRATUS"

@@ -12,6 +12,8 @@ RUN ln -sf app.jar app-all.jar
 # Make java resolvable even if the runtime overrides PATH (e.g. a Catalyst startup command)
 RUN ln -sf /opt/java/openjdk/bin/java /usr/bin/java
 
-EXPOSE 8080
+# Catalyst passes the port in X_ZOHO_CATALYST_LISTEN_PORT (default 9000); application.yaml reads it
+EXPOSE 9000
 
-ENTRYPOINT ["/opt/java/openjdk/bin/java", "-jar", "/app/app.jar"]
+# TieredStopAtLevel=1 and SerialGC cut JVM startup time; native access silences Netty warnings
+CMD ["/opt/java/openjdk/bin/java", "-XX:TieredStopAtLevel=1", "-XX:+UseSerialGC", "--enable-native-access=ALL-UNNAMED", "-jar", "/app/app.jar"]
