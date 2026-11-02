@@ -63,7 +63,6 @@ jobs:
           catalyst deploy appsail \
             --name somiq-server \
             --source docker://somiq-server:latest \
-            --port 9000 \
             --org "$CATALYST_ORG" \
             --project "$CATALYST_PROJECT" \
             --token "$CATALYST_TOKEN" \
